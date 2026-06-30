@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "1.0.1"
+    "version": "1.0.2"
   },
   "plugins": [
     {
@@ -16,8 +16,8 @@
         "source": "url",
         "url": "git@github.com:avegancafe/kitchen-brigade.git"
       },
-      "version": "1.0.1",
-      "description": "Lean, stack-agnostic multi-agent orchestration modeled on the brigade de cuisine. /chef routes to strategize / implement / workflow / diagnose; the chef runs the cast (sous-chef, cook, expediter).",
+      "version": "1.0.2",
+      "description": "Lean, stack-agnostic multi-agent orchestration modeled on the brigade de cuisine. /chef routes to strategize / implement / workflow / diagnose; the chef runs the cast (sous-chef, cook, expediter). Bundles the yes-chef greenlight and dinner-rush concurrency skills.",
       "category": "productivity"
     },
     {
@@ -26,8 +26,8 @@
         "source": "url",
         "url": "git@github.com:avegancafe/avegancafe-plugin.git"
       },
-      "version": "1.0.1",
-      "description": "Personal beads (bd) issue-tracking toolkit: capture/triage logging, tight bead titles, concurrency-aware posture, and a parent-epic-status PostToolUse hook.",
+      "version": "1.0.2",
+      "description": "Personal beads (bd) issue-tracking toolkit: capture/triage logging, tight bead titles, and a parent-epic-status PostToolUse hook.",
       "category": "productivity"
     }
   ]
