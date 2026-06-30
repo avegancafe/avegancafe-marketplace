@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "1.0.2"
+    "version": "1.0.3"
   },
   "plugins": [
     {
@@ -26,8 +26,8 @@
         "source": "url",
         "url": "git@github.com:avegancafe/avegancafe-plugin.git"
       },
-      "version": "1.0.2",
-      "description": "Personal beads (bd) issue-tracking toolkit: capture/triage logging, tight bead titles, and a parent-epic-status PostToolUse hook.",
+      "version": "1.0.3",
+      "description": "Kyle's portable grab-bag of personal Claude Code tooling — a catch-all for the skills and hooks he carries across machines. Currently: beads (bd) capture/triage logging, tight bead titles, and a parent-epic-status PostToolUse hook.",
       "category": "productivity"
     }
   ]
