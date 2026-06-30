@@ -6,6 +6,9 @@
     "name": "Kyle Holzinger",
     "url": "https://github.com/avegancafe"
   },
+  "metadata": {
+    "version": "1.0.1"
+  },
   "plugins": [
     {
       "name": "kitchen-brigade",
@@ -13,7 +16,7 @@
         "source": "url",
         "url": "git@github.com:avegancafe/kitchen-brigade.git"
       },
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Lean, stack-agnostic multi-agent orchestration modeled on the brigade de cuisine. /chef routes to strategize / implement / workflow / diagnose; the chef runs the cast (sous-chef, cook, expediter).",
       "category": "productivity"
     },
@@ -23,7 +26,7 @@
         "source": "url",
         "url": "git@github.com:avegancafe/avegancafe-plugin.git"
       },
-      "version": "1.0.0",
+      "version": "1.0.1",
       "description": "Personal beads (bd) issue-tracking toolkit: capture/triage logging, tight bead titles, concurrency-aware posture, and a parent-epic-status PostToolUse hook.",
       "category": "productivity"
     }
