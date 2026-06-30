@@ -1,6 +1,6 @@
 # avegancafe-marketplace
 
-Kyle's personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin marketplace.
+My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin marketplace.
 
 ## Add the marketplace
 

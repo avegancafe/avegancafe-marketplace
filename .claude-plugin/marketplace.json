@@ -1,13 +1,13 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "avegancafe-marketplace",
-  "description": "Kyle's personal Claude Code plugin marketplace.",
+  "description": "My personal Claude Code plugin marketplace.",
   "owner": {
     "name": "Kyle Holzinger",
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "1.0.3"
+    "version": "1.0.4"
   },
   "plugins": [
     {
@@ -16,7 +16,7 @@
         "source": "url",
         "url": "git@github.com:avegancafe/kitchen-brigade.git"
       },
-      "version": "1.0.2",
+      "version": "1.0.3",
       "description": "Lean, stack-agnostic multi-agent orchestration modeled on the brigade de cuisine. /chef routes to strategize / implement / workflow / diagnose; the chef runs the cast (sous-chef, cook, expediter). Bundles the yes-chef greenlight and dinner-rush concurrency skills.",
       "category": "productivity"
     },
@@ -26,8 +26,8 @@
         "source": "url",
         "url": "git@github.com:avegancafe/avegancafe-plugin.git"
       },
-      "version": "1.0.3",
-      "description": "Kyle's portable grab-bag of personal Claude Code tooling — a catch-all for the skills and hooks he carries across machines. Currently: beads (bd) capture/triage logging, tight bead titles, and a parent-epic-status PostToolUse hook.",
+      "version": "1.0.4",
+      "description": "My portable grab-bag of personal Claude Code tooling — a catch-all for the skills and hooks I carry across machines. Currently: beads (bd) capture/triage logging, tight bead titles, and a parent-epic-status PostToolUse hook.",
       "category": "productivity"
     }
   ]
