@@ -21,7 +21,7 @@
       "name": "avegancafe",
       "source": {
         "source": "url",
-        "url": "git@github.com:avegancafe/avegancafe.git"
+        "url": "git@github.com:avegancafe/avegancafe-plugin.git"
       },
       "version": "1.0.0",
       "description": "Personal beads (bd) issue-tracking toolkit: capture/triage logging, tight bead titles, concurrency-aware posture, and a parent-epic-status PostToolUse hook.",
