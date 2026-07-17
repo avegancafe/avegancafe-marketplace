@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "1.0.4"
+    "version": "1.1.0"
   },
   "plugins": [
     {
@@ -28,6 +28,20 @@
       },
       "version": "1.0.4",
       "description": "My portable grab-bag of personal Claude Code tooling — a catch-all for the skills and hooks I carry across machines. Currently: beads (bd) capture/triage logging, tight bead titles, and a parent-epic-status PostToolUse hook.",
+      "category": "productivity"
+    },
+    {
+      "name": "projects",
+      "source": "./plugins/projects",
+      "version": "1.0.0",
+      "description": "Manage a _projects/ folder: date-prefixed project directories (YYYY-MM-DD--<name>), each with a todo.md (checkbox todos, @-mentioned priorities, [assignee:<id>] assignees) and a <256-line README.md for small notes. Skills to initialize the folder (README + CLAUDE.md symlink), scaffold projects, and maintain todos.",
+      "category": "productivity"
+    },
+    {
+      "name": "session-ids",
+      "source": "./plugins/session-ids",
+      "version": "1.0.0",
+      "description": "Gives every session a readable id (random adjective-noun pair, e.g. brave-otter) via a SessionStart hook, plus a skill library to retrieve the current session's id and info. Ids double as assignee ids for the projects plugin's todo.md files.",
       "category": "productivity"
     }
   ]
