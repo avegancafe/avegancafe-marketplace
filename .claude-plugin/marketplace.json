@@ -16,7 +16,7 @@
         "source": "url",
         "url": "git@github.com:avegancafe/kitchen-brigade.git"
       },
-      "version": "1.0.3",
+      "version": "1.1.0",
       "description": "Lean, stack-agnostic multi-agent orchestration modeled on the brigade de cuisine. /chef routes to strategize / implement / workflow / diagnose; the chef runs the cast (sous-chef, cook, expediter). Bundles the yes-chef greenlight and dinner-rush concurrency skills.",
       "category": "productivity"
     },
