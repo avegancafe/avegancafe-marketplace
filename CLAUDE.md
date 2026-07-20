@@ -35,22 +35,26 @@ See [`.claude/patterns/README.md`](.claude/patterns/README.md) for the conventio
 
 ## What this repo is
 
-A Claude Code **plugin marketplace** — a thin index pointing at the plugin repos.
-It contains no plugin code itself.
+A Claude Code **plugin marketplace**. It's primarily an index pointing at
+external plugin repos, but some plugins are **vendored directly in this repo**
+under `plugins/` and referenced with relative-path sources.
 
 ## Layout
 
 ```
 .claude-plugin/marketplace.json   # The index: name, owner, metadata, plugins[]. REQUIRED.
 .claude/patterns/                 # Durable repo patterns (see ToC above)
+plugins/                          # Plugins vendored in this repo
+  projects/                       # _projects/ folder manager (skills + scripts)
+  session-ids/                    # readable session ids (SessionStart hook + skills)
 README.md
 ```
 
 ## How it references plugins
 
-Each `plugins[]` entry uses a `url` source pointing at the plugin's **own private
-repo** over SSH. The plugins are NOT vendored here — they live in
-`avegancafe/kitchen-brigade` and `avegancafe/avegancafe-plugin`.
+External plugins use a `url` source pointing at the plugin's **own private
+repo** over SSH — those are NOT vendored here (`avegancafe/kitchen-brigade`
+and `avegancafe/avegancafe-plugin`).
 
 ```json
 {
@@ -64,7 +68,20 @@ repo** over SSH. The plugins are NOT vendored here — they live in
 > (`avegancafe/avegancafe` is taken by the GitHub profile README). The plugin's
 > installable name is still `avegancafe`.
 
+Vendored plugins (`projects`, `session-ids`) use a relative-path source:
+
+```json
+{
+  "name": "projects",
+  "source": "./plugins/projects",
+  "version": "1.0.0"
+}
+```
+
 ## Editing rules
 
 - Adding a plugin = add an entry to `plugins[]`; `name` must match the plugin's `plugin.json` `name`.
+- For vendored plugins, the "keep versions in sync" rule applies to
+  `plugins/<name>/.claude-plugin/plugin.json` in this repo — bump it and the
+  marketplace entry together.
 - Validate JSON before committing: `python3 -m json.tool .claude-plugin/marketplace.json`.

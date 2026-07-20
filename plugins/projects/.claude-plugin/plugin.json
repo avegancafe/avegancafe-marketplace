@@ -1,0 +1,9 @@
+{
+  "name": "projects",
+  "version": "1.0.0",
+  "description": "Manage a _projects/ folder: date-prefixed project directories (YYYY-MM-DD--<name>), each with a todo.md (checkbox todos, @-mentioned priorities, [assignee:<id>] assignees) and a <256-line README.md for small notes. Ships skills to initialize the folder, scaffold projects, and maintain todos.",
+  "author": {
+    "name": "Kyle Holzinger",
+    "url": "https://github.com/avegancafe"
+  }
+}
