@@ -17,13 +17,18 @@ fi
 field() { sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\([^\"]*\)\".*/\1/p" "$2" | head -1; }
 
 if [[ "${1:-}" == "--list" ]]; then
-  found=0
+  lines=""
   for record in "$STATE_DIR"/*.json; do
     [[ -e "$record" ]] || continue
-    found=1
-    printf '%s\t%s\t%s\n' "$(field readable_id "$record")" "$(field session_id "$record")" "$(field started_at "$record")"
+    lines+="$(printf '%s\t%s\t%s' "$(field readable_id "$record")" "$(field session_id "$record")" "$(field started_at "$record")")"$'\n'
   done
-  (( found )) || echo "no session records in $STATE_DIR"
+  if [[ -z "$lines" ]]; then
+    echo "no session records in $STATE_DIR"
+  else
+    # Most recent first: started_at (column 3) is ISO-8601 UTC, so a reverse
+    # lexicographic sort is a reverse chronological sort.
+    printf '%s' "$lines" | sort -t $'\t' -k3,3r
+  fi
   exit 0
 fi
 

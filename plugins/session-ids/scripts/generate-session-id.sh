@@ -15,6 +15,17 @@ mkdir -p "$STATE_DIR"
 
 INPUT="$(cat || true)"
 
+# Minimal JSON string escaping for values interpolated into JSON below.
+json_escape() {
+  local s="$1"
+  s="${s//\\/\\\\}"
+  s="${s//\"/\\\"}"
+  s="${s//$'\n'/\\n}"
+  s="${s//$'\r'/\\r}"
+  s="${s//$'\t'/\\t}"
+  printf '%s' "$s"
+}
+
 # Pull a string field out of the hook JSON. Prefer python3, fall back to sed.
 json_field() {
   local field="$1"
@@ -35,6 +46,8 @@ SESSION_ID="$(json_field session_id)"
 SOURCE="$(json_field source)"
 CWD="$(json_field cwd)"
 [[ -n "$SESSION_ID" ]] || SESSION_ID="unknown-$$"
+# Filename-safe: the session id names the record file below.
+SESSION_ID="$(printf '%s' "$SESSION_ID" | tr -c 'a-zA-Z0-9._-' '_')"
 
 RECORD="$STATE_DIR/$SESSION_ID.json"
 
@@ -65,12 +78,12 @@ fi
 
 cat > "$RECORD" <<EOF
 {
-  "readable_id": "$READABLE_ID",
-  "session_id": "$SESSION_ID",
-  "started_at": "$STARTED_AT",
+  "readable_id": "$(json_escape "$READABLE_ID")",
+  "session_id": "$(json_escape "$SESSION_ID")",
+  "started_at": "$(json_escape "$STARTED_AT")",
   "last_seen_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "source": "${SOURCE:-startup}",
-  "cwd": "${CWD:-$PWD}"
+  "source": "$(json_escape "${SOURCE:-startup}")",
+  "cwd": "$(json_escape "${CWD:-$PWD}")"
 }
 EOF
 
@@ -85,5 +98,5 @@ import json, os
 print(json.dumps({'hookSpecificOutput': {'hookEventName': 'SessionStart', 'additionalContext': os.environ['CONTEXT']}}))
 "
 else
-  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$CONTEXT"
+  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$(json_escape "$CONTEXT")"
 fi

@@ -16,10 +16,10 @@ The session-ids plugin keeps one record per session in
    bash "${CLAUDE_PLUGIN_ROOT}/scripts/session-info.sh" --list
    ```
 
-   Output is one session per line: `readable_id`, `session_id` (UUID), and
-   `started_at`, tab-separated.
+   Output is one session per line, most recent first: `readable_id`,
+   `session_id` (UUID), and `started_at`, tab-separated.
 
-2. Present it as a small table, most recent first. If the user is resolving
+2. Present it as a small table. If the user is resolving
    an `[assignee:<id>]` link from a todo.md, match on the `readable_id`
    column and offer the full record
    (`session-info.sh <session_id>`) for details.
