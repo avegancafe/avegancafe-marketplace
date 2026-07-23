@@ -4,6 +4,21 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2026-07-23
+
+### Added
+- `docs/network-pipeline/` — documentation of the J2 network pipeline (docs-only,
+  no plugin changes):
+  - `README.md` — a sourced, end-to-end verbal description of the pipeline from
+    customer upload to the "your network is ready" email, including the
+    customer-impacting milestones (network selectable, scores visible, reporting
+    data available, completion email), error/email semantics, timings, and the
+    2026 incidents that shaped the current ordering.
+  - `index.html` — a self-contained interactive visualization ("The Life of a
+    Network"): a scrubbable dual-lane journey map (machine lane vs what the
+    customer sees) with milestone flags, a gremlin-mode failure-path overlay,
+    and war-story annotations. J2-branded, light/dark aware.
+
 ## [1.1.0] - 2026-07-17
 
 ### Added

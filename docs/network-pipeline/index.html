@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Life of a Network — J2 Pipeline</title>
+<style>
+/* ============ J2 tokens, themed ============ */
+:root{
+  --navy:#253761; --navy-soft:#515579; --navy-tint:#d8dae3; --navy-tint-2:#ecedf2;
+  --orange:#FBA94B; --orange-soft:#FFC888; --orange-ink:#b3650f;
+  --ink:#383842; --muted:#696978; --muted-soft:#9595a0;
+  --paper:#fafaf9; --card:#ffffff; --paper-deep:#F0F0ED; --rule:#dadbd6; --rule-soft:#e8e8e3;
+  --good:#4b9852; --bad:#b26063;
+  --lane-machine:#253761; --lane-machine-soft:#8fa0c4;
+  --quiet:#e9e7e0; --quiet-ink:#8a8878;
+  --flag-ink:#253761; --shadow:0 1px 2px rgba(37,55,97,.08),0 6px 24px -12px rgba(37,55,97,.25);
+  --sans:"Rubik",ui-rounded,"SF Pro Rounded","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --navy:#c6d1ec; --navy-soft:#8fa0c4; --navy-tint:#2b3a5e; --navy-tint-2:#1d2843;
+    --orange:#FBA94B; --orange-soft:#b3650f; --orange-ink:#ffc888;
+    --ink:#d4d6de; --muted:#9aa0b2; --muted-soft:#6d7488;
+    --paper:#10162a; --card:#182038; --paper-deep:#1d2643; --rule:#2c3654; --rule-soft:#232d4a;
+    --good:#7fc287; --bad:#e09a9d;
+    --lane-machine:#97a9d6; --lane-machine-soft:#4d5c85;
+    --quiet:#171e35; --quiet-ink:#5d6478;
+    --flag-ink:#10162a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px -12px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --navy:#c6d1ec; --navy-soft:#8fa0c4; --navy-tint:#2b3a5e; --navy-tint-2:#1d2843;
+  --orange:#FBA94B; --orange-soft:#b3650f; --orange-ink:#ffc888;
+  --ink:#d4d6de; --muted:#9aa0b2; --muted-soft:#6d7488;
+  --paper:#10162a; --card:#182038; --paper-deep:#1d2643; --rule:#2c3654; --rule-soft:#232d4a;
+  --good:#7fc287; --bad:#e09a9d;
+  --lane-machine:#97a9d6; --lane-machine-soft:#4d5c85;
+  --quiet:#171e35; --quiet-ink:#5d6478;
+  --flag-ink:#10162a; --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px -12px rgba(0,0,0,.6);
+}
+:root[data-theme="light"]{
+  --navy:#253761; --navy-soft:#515579; --navy-tint:#d8dae3; --navy-tint-2:#ecedf2;
+  --orange:#FBA94B; --orange-soft:#FFC888; --orange-ink:#b3650f;
+  --ink:#383842; --muted:#696978; --muted-soft:#9595a0;
+  --paper:#fafaf9; --card:#ffffff; --paper-deep:#F0F0ED; --rule:#dadbd6; --rule-soft:#e8e8e3;
+  --good:#4b9852; --bad:#b26063;
+  --lane-machine:#253761; --lane-machine-soft:#8fa0c4;
+  --quiet:#e9e7e0; --quiet-ink:#8a8878;
+  --flag-ink:#253761; --shadow:0 1px 2px rgba(37,55,97,.08),0 6px 24px -12px rgba(37,55,97,.25);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{color:var(--navy);font-weight:500;text-wrap:balance;margin:0}
+em{font-style:italic}
+a{color:var(--navy);text-decoration-color:var(--orange)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;display:flex;align-items:center;gap:8px;margin:0 0 10px}
+.eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--orange);flex:none}
+.mono{font-family:var(--mono)}
+kbd,code{font-family:var(--mono);font-size:.86em;background:var(--paper-deep);border:1px solid var(--rule);border-radius:4px;padding:1px 5px;color:var(--ink)}
+button{font-family:var(--sans)}
+:focus-visible{outline:2px solid var(--orange-ink);outline-offset:2px;border-radius:4px}
+
+/* ============ header ============ */
+header{padding:56px 0 8px}
+header h1{font-size:clamp(30px,4.4vw,52px);line-height:1.06;letter-spacing:-.018em}
+header h1 em{color:var(--orange-ink)}
+.lede{font-size:clamp(15px,1.7vw,18px);color:var(--muted);max-width:62ch;margin:14px 0 0}
+.statrow{display:flex;flex-wrap:wrap;gap:12px;margin:28px 0 0}
+.stat{flex:1 1 180px;background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;box-shadow:var(--shadow)}
+.stat b{display:block;font-size:24px;font-weight:600;color:var(--navy);font-variant-numeric:tabular-nums;line-height:1.2}
+.stat b .approx{color:var(--muted-soft);font-weight:400}
+.stat span{font-size:12.5px;color:var(--muted)}
+
+/* ============ controls ============ */
+.controls{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin:34px 0 12px;position:sticky;top:0;z-index:30;background:color-mix(in srgb,var(--paper) 88%,transparent);backdrop-filter:blur(6px);padding:10px 0;border-bottom:1px solid var(--rule-soft)}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);background:var(--card);color:var(--navy);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:500;cursor:pointer;box-shadow:var(--shadow)}
+.btn:hover{border-color:var(--navy-soft)}
+.btn.primary{background:var(--navy);color:var(--paper);border-color:var(--navy)}
+:root[data-theme="dark"] .btn.primary,body .btn.primary{}
+.btn.primary:hover{filter:brightness(1.1)}
+.btn[aria-pressed="true"]{background:var(--orange);border-color:var(--orange);color:#3c2a10}
+.scrub{flex:1 1 240px;display:flex;align-items:center;gap:10px;min-width:200px}
+.scrub input[type="range"]{flex:1;accent-color:var(--orange-ink);height:22px}
+.clock{font-family:var(--mono);font-size:13px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;min-width:150px;text-align:right}
+.clock b{color:var(--navy);font-weight:600}
+
+/* ============ the stage ============ */
+.stagebox{border:1px solid var(--rule);border-radius:14px;background:var(--card);box-shadow:var(--shadow);overflow:hidden;margin:0 0 8px}
+.stage-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.stage-scroll svg{display:block}
+.lane-label{font-size:11px;letter-spacing:.18em;font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:16px;padding:10px 16px;border-top:1px solid var(--rule-soft);font-size:12.5px;color:var(--muted);align-items:center}
+.legend .key{display:inline-flex;align-items:center;gap:6px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none}
+.hint-scroll{font-size:12px;color:var(--muted-soft);margin-left:auto}
+
+/* svg text + shapes inherit tokens via CSS variables */
+svg text{font-family:var(--sans)}
+svg .t-mono{font-family:var(--mono)}
+.station{cursor:pointer}
+.station:hover .st-bubble,.station:focus-visible .st-bubble{stroke:var(--orange-ink);stroke-width:2}
+.station .st-bubble{transition:stroke .15s}
+.milestone{cursor:pointer}
+.milestone:hover .ms-flag,.milestone:focus-visible .ms-flag{filter:brightness(1.06)}
+.hazard{cursor:pointer}
+@media (prefers-reduced-motion: no-preference){
+  .pulse{animation:pulse 2.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+  .float{animation:floaty 3.4s ease-in-out infinite}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  .zz{animation:zz 3s ease-in-out infinite}
+  @keyframes zz{0%,100%{opacity:.25}50%{opacity:.9}}
+}
+
+/* ============ drawer ============ */
+.drawer{margin:14px 0 0;border:1px solid var(--rule);border-radius:12px;background:var(--card);box-shadow:var(--shadow);padding:18px 20px;min-height:96px}
+.drawer .d-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-bottom:6px}
+.drawer h3{font-size:18px;font-weight:600}
+.drawer .d-body{max-width:78ch;color:var(--ink);font-size:14.5px}
+.drawer .d-body p{margin:.5em 0}
+.chip{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;border-radius:999px;padding:2px 10px;vertical-align:1px}
+.chip.machine{background:var(--navy-tint-2);color:var(--navy)}
+.chip.customer{background:var(--orange);color:#3c2a10}
+.chip.timing{background:var(--paper-deep);color:var(--muted);font-family:var(--mono);letter-spacing:0}
+.chip.conf-high{background:var(--paper-deep);color:var(--good)}
+.chip.conf-med{background:var(--paper-deep);color:var(--orange-ink)}
+.chip.conf-approx{background:var(--paper-deep);color:var(--muted);border:1px dashed var(--rule)}
+.chip.mail{background:var(--paper-deep);color:var(--navy);font-weight:500}
+.src{font-size:12px;color:var(--muted-soft);margin-top:8px}
+
+/* ============ sections ============ */
+section.block{margin:56px 0 0}
+section.block>.wrap>p.intro{color:var(--muted);max-width:70ch;margin:8px 0 24px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow);position:relative}
+.card h3{font-size:16px;font-weight:600;margin:8px 0 6px}
+.card p{font-size:13.5px;color:var(--ink);margin:0}
+.card .when{font-family:var(--mono);font-size:11.5px;color:var(--muted-soft);display:block;margin-top:10px}
+.badge{position:absolute;top:-11px;left:14px;background:var(--orange);color:#3c2a10;font-weight:700;font-size:12px;border-radius:999px;padding:2px 10px;letter-spacing:.04em}
+.badge.dashed{background:var(--card);color:var(--orange-ink);border:1.5px dashed var(--orange-ink)}
+.mailrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:14px}
+.mail{background:var(--paper-deep);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.mail .env{font-size:20px}
+.mail h3{font-size:14.5px;margin:6px 0 4px}
+.mail p{font-size:13px;color:var(--muted);margin:0}
+.mail .note{display:block;margin-top:8px;font-size:11.5px;color:var(--muted-soft)}
+.mail.err{border-color:color-mix(in srgb,var(--bad) 45%,var(--rule))}
+
+/* war stories */
+.story{display:flex;gap:14px;background:var(--card);border:1px solid var(--rule);border-radius:12px;padding:16px 18px;box-shadow:var(--shadow)}
+.stories{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.story .art{font-size:26px;flex:none;line-height:1}
+.story h3{font-size:15px;font-weight:600;margin:0 0 4px}
+.story p{font-size:13px;color:var(--muted);margin:0}
+.story .fix{display:block;margin-top:8px;font-size:12px;color:var(--good);font-weight:500}
+
+/* footer */
+footer{margin:64px 0 40px;border-top:1px solid var(--rule);padding-top:20px;font-size:12.5px;color:var(--muted)}
+footer .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px}
+footer h3{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600;margin-bottom:6px}
+footer ul{margin:0;padding-left:16px}
+footer li{margin:2px 0}
+
+@media (max-width:640px){
+  header{padding-top:36px}
+  .clock{min-width:0;flex:1;text-align:left}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <p class="eyebrow">J2 · Network pipeline · from upload to inbox</p>
+    <h1>The life of a <em>network</em></h1>
+    <p class="lede">One CSV's journey from “Create Network” to “Your network is ready” — and the four moments a
+    customer actually feels along the way. The machine is busy the whole time; the customer's screen is quiet
+    almost the whole time. That gap is the story.</p>
+    <div class="statrow" role="list">
+      <div class="stat" role="listitem"><b>2<span class="approx"> emails</span></b><span>in a happy run — kickoff &amp; ready. In between: silence.</span></div>
+      <div class="stat" role="listitem"><b>12<span class="approx"> stages</span></b><span>tracked internally (PLA-175) · 0 visible to customers</span></div>
+      <div class="stat" role="listitem"><b>~45<span class="approx"> min</span></b><span>typical happy path · big or cold-cache runs take hours</span></div>
+      <div class="stat" role="listitem"><b>4<span class="approx"> milestones</span></b><span>customers actually experience: A·B·C·D below</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="controls">
+    <button class="btn primary" id="playBtn" aria-label="Play or pause the run">▶ Run a network</button>
+    <div class="scrub">
+      <input type="range" id="scrubber" min="0" max="1000" value="0" aria-label="Scrub through the run timeline">
+    </div>
+    <div class="clock" id="clock">T+<b>0 min</b> · uploaded</div>
+    <button class="btn" id="gremlinBtn" aria-pressed="false" title="Reveal the failure paths">😈 Gremlin mode</button>
+  </div>
+
+  <div class="stagebox">
+    <div class="stage-scroll" id="stageScroll">
+      <svg id="stage" width="4240" height="620" viewBox="0 0 4240 620" role="img"
+           aria-label="Dual-lane journey map of a network run: the machine lane on top shows pipeline stages; the customer lane below shows the few moments a customer can see."></svg>
+    </div>
+    <div class="legend">
+      <span class="key"><span class="dot" style="background:var(--lane-machine)"></span> machine lane (invisible to customers)</span>
+      <span class="key"><span class="dot" style="background:var(--orange)"></span> customer-visible milestone</span>
+      <span class="key"><span class="dot" style="background:var(--bad)"></span> ✗ failure exit (gremlin mode)</span>
+      <span class="key mono" style="font-size:11.5px">⭐ = milestone · 📧 = email · dashed = approximate</span>
+      <span class="hint-scroll">⇢ scrolls sideways · click anything for details</span>
+    </div>
+  </div>
+
+  <aside class="drawer" id="drawer" aria-live="polite">
+    <div class="d-head"><h3>Pick a station</h3></div>
+    <div class="d-body"><p>Click any stop on the map — machine stations, orange milestone flags, or (in gremlin
+    mode) the red failure exits — to see what happens there, how long it takes, and how sure we are about it.
+    Or press <b>▶ Run a network</b> and watch Netty the CSV make the trip.</p></div>
+  </aside>
+</div>
+
+<section class="block" id="milestones">
+  <div class="wrap">
+    <p class="eyebrow">The four moments that matter</p>
+    <h2>Critical, customer-impacting milestones</h2>
+    <p class="intro">Everything else on the map is machinery. These are the points where a customer's reality
+    changes — and note how late (and how quietly) most of them arrive.</p>
+    <div class="cards" style="margin-top:20px">
+      <div class="card"><span class="badge dashed">A · ~selectable</span>
+        <h3>Network appears &amp; is selectable</h3>
+        <p>After provider data migrates to Postgres, the network quietly shows up in the dropdown —
+        <em>scoreless and unannounced</em>. “The network is selectable, but there are maybe no scores and they
+        haven't gotten the email yet.” Exact gate unconfirmed; placement approximate.</p>
+        <span class="when">after handoff · before any scores · before any email</span>
+      </div>
+      <div class="card"><span class="badge">B · scores</span>
+        <h3>Scores become visible</h3>
+        <p>Until the adequacy tables fill, the scorecard API literally 404s (“not yet available”). Scores land
+        mid-to-late chain — and a deploy-triggered re-run can still flicker them blank → partial → full.</p>
+        <span class="when">late in the score chain · order vs C varies by tenant flag</span>
+      </div>
+      <div class="card"><span class="badge">C · reporting</span>
+        <h3>Reporting data available</h3>
+        <p><code>reporting_data_available_at</code> is stamped, queued PDFs fire, and report building unblocks.
+        Whether B and C are one moment or two is unresolved <em>even inside J2</em> — it depends on a per-tenant flag.</p>
+        <span class="when">after the 6–14 min reporting hop</span>
+      </div>
+      <div class="card"><span class="badge">D · told</span>
+        <h3>The customer is finally told</h3>
+        <p>“Your network is ready” (or “…but we found some issues with your data”) is now the <em>terminal</em>
+        chain step — sent after <code>completed_at</code>, stamped at-most-once, and once sent the run can never
+        auto-restart. Initiator only; teammates never hear a thing.</p>
+        <span class="when">the very last step · typically ~45 min after upload</span>
+      </div>
+    </div>
+
+    <div class="mailrow">
+      <div class="mail"><span class="env">📨</span><h3>#1 · Kickoff</h3>
+        <p>“We are processing your network.” Sent at button-press — before the queue even starts. Initiator only.</p>
+        <span class="note">skipped for SFTP feeds &amp; recipient-less tasks · prod only</span></div>
+      <div class="mail"><span class="env">🎉</span><h3>#2 · Ready</h3>
+        <p>“Your network is ready in J2.” Terminal step, after everything durably commits. At-most-once.</p>
+        <span class="note">stamps completion_notified_at → “never restart after telling them”</span></div>
+      <div class="mail"><span class="env">🧐</span><h3>#3 · Ready, with issues</h3>
+        <p>“Inaccurate data found for &lt;network&gt;” — same moment as #2, different copy when a
+        troubleshooting file exists.</p>
+        <span class="note">copy gated on the validation results file (NAVY-1142)</span></div>
+      <div class="mail err"><span class="env">🚨</span><h3>#4 · Problem (maybe)</h3>
+        <p>“Action Required: Problem processing your network.” Fired from exactly 5 call sites — and at least 7
+        failure paths send <em>nothing</em>. Not deduped: can arrive twice.</p>
+        <span class="note">the DB's errored_at is more reliable than this email</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="stories">
+  <div class="wrap">
+    <p class="eyebrow">Scar tissue · 2026</p>
+    <h2>War stories the pipeline now guards against</h2>
+    <p class="intro">Three incidents shaped today's ordering and guardrails. Toggle 😈 gremlin mode on the map to
+    see where each one bit.</p>
+    <div class="stories" style="margin-top:18px">
+      <div class="story"><div class="art">🫠</div><div>
+        <h3>April — the silent wedge</h3>
+        <p>Pipeline workers quietly stopped consuming; pods looked healthy for hours. Customers got kickoff
+        emails, then… nothing, on a filing deadline day.</p>
+        <span class="fix">✓ fixed: real liveness probes → ~8 min auto-recovery (#2401/#2406)</span></div></div>
+      <div class="story"><div class="art">📬</div><div>
+        <h3>June 10 — 26 false failure emails</h3>
+        <p>A starved reporting queue stranded 26 fire-and-forgotten chains ~15 h; a blind bulk re-kick made the
+        drained originals lose snapshot races → 26 “your network failed” emails for healthy networks, and one
+        customer's re-upload loop.</p>
+        <span class="fix">✓ fixed: superseded attempts now stand down silently (#2805) + 12 h watchdog tier (#2807)</span></div></div>
+      <div class="story"><div class="art">🫥</div><div>
+        <h3>June 24 — ready… then blank</h3>
+        <p>A deploy re-delivered a finished-but-unacked run: customer got the ready email, then watched data go
+        blank → partial (east coast only) → full on refresh.</p>
+        <span class="fix">✓ fixed: email moved to the terminal step + “once told, never restart” (#2957)</span></div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <h3>How to read this</h3>
+        <p>Solid shapes are multiply-sourced <b>[HIGH]</b> facts; dashed shapes are approximate placements the
+        team itself hasn't pinned down (milestone A's exact gate; B vs C ordering). Timings are typical, not
+        guaranteed — queues stretch, big networks take hours.</p>
+      </div>
+      <div>
+        <h3>Sources</h3>
+        <ul>
+          <li>Network Status PRD (Notion) &amp; kickoff recording (Fathom, 2026-07-20)</li>
+          <li>Slack engineering threads incl. bot code-traces (#team-platform, #void, #adequacy-bugs…)</li>
+          <li>Linear: PLA-175/200/204/207, SUP-166, NAVY-1142 · Amplitude event taxonomy</li>
+          <li>Companion doc: <span class="mono">docs/network-pipeline/README.md</span></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Snapshot</h3>
+        <p>Behavior as of <span class="mono">2026-07-22</span>, post-PR&nbsp;#2957 (email terminal). The Network
+        Status project (Processing / Errored / Ready in-app) is the roadmap overlay that will close the quiet gap
+        this page illustrates.</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+/* =====================================================================
+   The Life of a Network — dual-lane journey map
+   Machine lane y≈150 · customer lane y≈450 · x = time (not to scale)
+   ===================================================================== */
+const SVGNS = "http://www.w3.org/2000/svg";
+const stage = document.getElementById("stage");
+const MACH_Y = 150, CUST_Y = 462, W = 4240;
+
+/* ---------- phase bands (background) ---------- */
+const BANDS = [
+  {x0:60,   x1:560,  label:"INTAKE · seconds"},
+  {x0:560,  x1:940,  label:"QUEUE · 0 min → hours"},
+  {x0:940,  x1:2620, label:"HEAVY PIPELINE · adequacy_pipeline queue · ~15–25 min floor"},
+  {x0:2620, x1:2860, label:"HANDOFF"},
+  {x0:2860, x1:3960, label:"SCORE CHAIN · dbt → default → reporting → default · fire-and-forgotten"},
+];
+
+/* ---------- stations (machine lane) ---------- */
+const STATIONS = [
+ {id:"upload", x:150, icon:"📄", title:"The upload", sub:"CreateNetworkPage / Update drawer",
+  t:"T+0", conf:"high",
+  d:`<p>The customer names the network, picks a county service area and a regulatory standard, and uploads the
+     provider CSV (per-tenant template: NPI, address, specialty, INN/OON…). <b>Validation runs synchronously</b> —
+     fatals block, warnings come with a downloadable <em>troubleshooting file</em>. This modal is the <b>only
+     instantaneous feedback in the entire journey</b>.</p>`,
+  src:"Slack intake lineage C06GUHW8272 · validation modal C0AS21S9UNR · Amplitude taxonomy"},
+ {id:"intake", x:400, icon:"🗂️", title:"Records & enqueue", sub:"SelfServeTask · Snapshot · ChangeEvent",
+  t:"T+seconds", conf:"high",
+  d:`<p>The file lands in GCS; three Postgres records are born (<code>SelfServeTask</code>,
+     <code>NetworkSnapshot</code>, <code>NetworkChangeEvent</code> — latest snapshot = truth); stage
+     <code>queued</code> is stamped and <code>run_self_serve_pipeline</code> is enqueued. 📧 <b>Email #1 fires
+     now</b>, at button-press — not when a worker picks it up.</p>`,
+  src:"Notion PRD · C0ANV1TE295 incident explainer · C0AS2QVNLJJ state-of-the-world"},
+ {id:"queue", x:740, icon:"☕", title:"The waiting room", sub:"small fixed worker pool · no autoscaling",
+  t:"0 min – hours", conf:"high",
+  d:`<p>Runs wait for a slot on a small, fixed pool (bursts of ~100 uploads from one tenant have tripped queue
+     alarms). Customers can't see queue position — deliberately out of scope even in the Network Status
+     project. On the customer's screen: <b>still nothing</b>. On Create there's no row at all; on Update the old
+     row keeps serving stale-but-stable data.</p>`,
+  src:"Notion PRD non-goals · #void queue-burst thread · #team-platform"},
+ {id:"format", x:1080, icon:"🧹", title:"Format", sub:"prepare.format_providers",
+  t:"~1–2 min", conf:"high",
+  d:`<p>The raw upload becomes <code>Formatted_Pipeline_Data</code> in a per-run BigQuery dataset
+     (<code>adequacy_network_create_production_…</code>). From here on it's ~25 <em>serial</em> BQ jobs — the
+     reason even an 8-provider network takes ~15–25 minutes.</p>`,
+  src:"Stage-machine tech doc F0BJJMCMZSM · staging run trace C0AS2QVNLJJ"},
+ {id:"universe", x:1360, icon:"📍", title:"Build the universe", sub:"build.assemble_universe · geocoding",
+  t:"~3–6 min", conf:"high",
+  d:`<p>INN + OON provider universes are assembled with the first big dedup (<code>SELECT DISTINCT</code> over
+     ~13 columns), and every provider address is <b>geocoded via Precisely</b> (cached by address hash).
+     Fun fact with support-ticket consequences: dedup is <em>silent</em> — a 170k-row file can legally become
+     ~117k provider-locations with zero feedback.</p>`,
+  src:"BQ row-count trace C0AS21S9UNR · geocoder threads C0AT3LD89MY"},
+ {id:"validate", x:1640, icon:"🔎", title:"Validate", sub:"build.validate_universe",
+  t:"~1 min", conf:"med",
+  d:`<p><code>validation_results</code> is produced — deactivated NPIs, template violations, specialty
+     groupings. If it has rows, the run gets a troubleshooting file and the eventual completion email switches
+     to its “…we found some issues” variant.</p>`,
+  src:"Stage catalog F0BJJMCMZSM · NAVY-1142"},
+ {id:"combine", x:1880, icon:"🧬", title:"Combine & dedup", sub:"build.combine_providers",
+  t:"~1–3 min", conf:"high",
+  d:`<p>Second dedup pass down to unique <code>provider_location_id</code> (NPI + geocoded address), then INN and
+     OON get combined into the scoring universe.</p>`,
+  src:"BQ row-count trace C0AS21S9UNR"},
+ {id:"pmd", x:2150, icon:"🛣️", title:"Distance matrix (PMD)", sub:"build.compute_distances",
+  t:"fast → hours", conf:"high",
+  d:`<p><b>The expensive one.</b> The provider×member drive-time/distance matrix: GraphHopper road-routing for
+     INN providers, a precomputed global PMD for OON. Members are census-sampled points from the standard's
+     member file. Warm caches make it minutes; a cold-cache custom-member run once built a 5.45-billion-row PMD
+     live.</p>`,
+  src:"PMD threads C07EHCCF08H / C0AS2QVNLJJ · GraphHopper traces"},
+ {id:"migrate", x:2440, icon:"🚚", title:"Migrate to Postgres", sub:"handoff.copy_pmd · handoff.migrate_universe",
+  t:"~2–5 min", conf:"high",
+  d:`<p>The provider universe ships from BigQuery into the app database (<code>in_network_provider_location</code>
+     et al., in 1000-row batches). This is the <b>only resumable stage</b> — if a deploy kills the worker, an
+     <code>acks_late</code> redelivery resumes here instead of recomputing everything.</p>`,
+  src:"Stage catalog F0BJJMCMZSM · pu_migration threads"},
+ {id:"handoff", x:2720, icon:"🎯", title:"Fire-and-forget", sub:"build_score_chain().apply_async()",
+  t:"instant", conf:"high",
+  d:`<p>The pipeline flings the completion chain onto the async queues, sets stage <code>score</code>, and
+     <b>reports itself successful while the run is unfinished</b>. From here, nothing is watching except an
+     hourly watchdog (12 h internal alert · 48 h force-error). This design saves ~38% of worker time — and is
+     the root of every “stranded chain” war story.</p>
+     <p>⭐ Right around here, <b>Milestone A</b> happens on the customer lane — quietly.</p>`,
+  src:"PR #2600 “direct-enqueue” · incident explainer C0ANV1TE295"},
+ {id:"dbt", x:3010, icon:"🧮", title:"Score it", sub:"covered_members → scores (dbt)",
+  t:"~3–8 min", conf:"high",
+  d:`<p>dbt models compute per-(county × zip × specialty × metric) coverage fractions —
+     <code>DRIVE_TIME</code>, <code>DRIVE_DISTANCE</code>, <code>MINIMUM_COUNT</code>(±in-zip/county) — combined
+     per the standard's AND/OR logic. Then the merge steps push score rows into the tenant's Postgres schema.</p>`,
+  src:"Score-chain traces C0B1K1AERA5 · score SQL C06DLMJB77E"},
+ {id:"reporting", x:3300, icon:"⏳", title:"The reporting hop", sub:"populate_initial_reporting_data",
+  t:"6–14 min", conf:"high",
+  d:`<p><b>The serial bottleneck.</b> Rebuilds the app-facing tables (provider locations & specialties, member
+     access, zip summaries, <code>NetworkZipCountyScore</code>) on a queue <em>shared with exports and report
+     packets</em> — the June 10 starvation. Ends by stamping ⭐ <code>reporting_data_available_at</code>
+     (Milestone C) and firing any queued PDFs.</p>`,
+  src:"Per-service breakdown C06DLMJB77E · incident explainer"},
+ {id:"adequacy", x:3560, icon:"🗺️", title:"Adequacy tables", sub:"populate_county/zip_adequacy",
+  t:"~1–4 min", conf:"high",
+  d:`<p><code>CountySpecialtyAdequacy</code> / <code>ZipSpecialtyAdequacy</code> fill — these are what the
+     scorecard and zip map actually read. ⭐ <b>Milestone B: scores render</b> (before this, the aggregates API
+     404s: “not yet available”). B vs C ordering is tenant-flag dependent — genuinely unresolved internally.</p>`,
+  src:"Zip-adequacy trace C0AS2QVNLJJ · PRD open questions"},
+ {id:"bookkeep", x:3790, icon:"📗", title:"Bookkeeping", sub:"slack · finalize · update_task_result",
+  t:"~1 min", conf:"high",
+  d:`<p>Internal Slack post to <code>#logs-network-prod</code>, <code>finalize_score_calculation</code>, then
+     <code>update_task_result</code> durably commits <code>completed_at</code> + the winning snapshot, and
+     <code>check_batch_completion</code> rolls up batches. The run is now <em>true</em>.</p>`,
+  src:"Post-#2957 ordering · C0B1K1AERA5 · [MED] slack position"},
+ {id:"ready", x:4040, icon:"📮", title:"“Your network is ready”", sub:"send_network_completion_email · TERMINAL",
+  t:"~T+45 min typ.", conf:"high",
+  d:`<p>⭐ <b>Milestone D.</b> The completion email (clean, or “…we found some issues” when a troubleshooting
+     file exists) is the <b>terminal step</b> since PR #2957 — after <code>completed_at</code>, stamped
+     <code>completion_notified_at</code> under lock: at-most-once, and once sent the run can <em>never</em>
+     auto-restart. Initiator only. 🎉</p>`,
+  src:"PR #2957 (opened Jun 24, merged ~Jul 9) · C0B1K1AERA5"},
+];
+
+/* ---------- customer-lane milestones ---------- */
+const MILESTONES = [
+ {id:"m-validate", x:150,  flag:"✅", label:"validation modal", approx:false, kind:"ui",
+  title:"Instant feedback (the only kind)", conf:"high",
+  d:`<p>Fatals vs warnings + a downloadable troubleshooting file, right in the request. After this modal closes,
+     the app goes quiet: <b>on Create no row exists anywhere; on Update the old row sits unchanged.</b></p>`,
+  src:"ValidationResultsDialog threads · Notion PRD"},
+ {id:"m-mail1", x:400, flag:"📧", label:"#1 “processing”", approx:false, kind:"mail",
+  title:"Email #1 — kickoff", conf:"high",
+  d:`<p>“We are processing your network.” Sent at button-press to the initiator only — teammates get no signal,
+     ever. Skipped for SFTP feeds; silenced outside prod. Then the <b>long quiet</b> begins.</p>`,
+  src:"Notion PRD · C0AS2QVNLJJ · Fathom kickoff"},
+ {id:"m-A", x:2790, flag:"⭐", label:"A · selectable (~)", approx:true, kind:"milestone",
+  title:"Milestone A — quietly visible & selectable", conf:"approx",
+  d:`<p>Around the handoff, the network starts appearing in the dropdown — <b>scoreless, unannounced, before any
+     email</b>. Kyle: “the network is selectable, but there are maybe no scores and they haven't gotten the
+     email yet… why can I see some of the network but not all of it?” The exact gate is unconfirmed (hence the
+     dashed flag) — pinning it down is a named action item of the Network Status project.</p>`,
+  src:"Fathom kickoff 2026-07-20 @10:21 · placement approximate"},
+ {id:"m-C", x:3300, flag:"⭐", label:"C · reporting data", approx:true, kind:"milestone",
+  title:"Milestone C — reports unblock", conf:"med",
+  d:`<p><code>reporting_data_available_at</code> is stamped; queued PDFs fire; report building unblocks. Drawn
+     dashed because whether B and C are one moment or two — and in which order — depends on a per-tenant flag
+     and is an open question in the PRD itself.</p>`,
+  src:"SUP-102 gating · per-service breakdown · PRD open questions"},
+ {id:"m-B", x:3560, flag:"⭐", label:"B · scores appear", approx:true, kind:"milestone",
+  title:"Milestone B — the scorecard lights up", conf:"med",
+  d:`<p>Adequacy tables filled → the scorecard stops 404-ing and renders scores. Until #2957, a deploy-triggered
+     re-run could flicker this blank → partial → full <em>after</em> the ready email; a sub-second race window
+     remains (PLA-204).</p>`,
+  src:"Zip-adequacy 404 trace · June 24 thread · PLA-204"},
+ {id:"m-D", x:4040, flag:"🎉", label:"D · 📧 “ready”", approx:false, kind:"milestone",
+  title:"Milestone D — the customer is told", conf:"high",
+  d:`<p>Email #2 “your network is ready” (or #3 “…we found some issues”) lands — the very last step of the whole
+     journey, typically ~45 minutes after upload, hours for big runs. This is the moment the PRD wants the
+     in-app “Ready” label to equal, keyed off <code>completion_notified_at</code>.</p>`,
+  src:"PR #2957 · NAVY-1142 · C0AS2QVNLJJ mapping"},
+];
+
+/* ---------- gremlin-mode hazards ---------- */
+const HAZARDS = [
+ {x:1500, mail:true,  label:"pipeline throws", d:`<p><b>In-pipeline failure</b> → task errored + 📧 error email
+   (1 of exactly 5 send sites). No app-level retry: first hard failure is terminal.</p>`,
+   src:"self_serve_pipeline.py:77 via C0BCGMG0YDR audit", title:"Failure exit — pipeline exception"},
+ {x:2150, mail:false, label:"worker killed", d:`<p><b>Deploy / worker death</b> → no exception, no email —
+   <code>acks_late</code> redelivers and the run resumes (or re-runs, which is what caused the June 24
+   flicker). Customer sees nothing… which is both the feature and the bug.</p>`,
+   src:"acks_late semantics · PLA-200", title:"Failure exit — silent redelivery"},
+ {x:2440, mail:false, label:"PU contention", d:`<p><b>Provider-universe contention</b> historically re-dispatched
+   silently ~80× over ~2 h, then marked errored with <em>no email</em>. Fixed July 1 (SUP-166: bounded-concurrency
+   semaphore).</p>`, src:"SUP-166 · run_pipeline.py:95", title:"Failure exit — PU contention (fixed)"},
+ {x:3300, mail:false, label:"chain strands", d:`<p><b>Stranded chain</b> — a lost message or starved queue kills
+   progress with no exception → nothing emails, nothing alerts until the watchdog: 12 h → internal Sentry alert;
+   48 h → force-error + a (possibly false!) 📧 failure email. It marks; it never recovers.</p>`,
+   src:"June 10 incident · #2807 watchdog tiers", title:"Failure exit — the silent strand"},
+ {x:3560, mail:true,  label:"chain throws", d:`<p><b>Score-chain failure</b> → <code>link_error</code> marks the
+   task errored + 📧 error email — <em>unless</em> the attempt was superseded by a newer run (silent stand-down,
+   the June 10 fix) or already completed. Error emails have no dedup: reruns can double-send (PLA-207).</p>`,
+   src:"adequacy/tasks.py link_error · #2805 · PLA-207", title:"Failure exit — chain exception"},
+];
+
+/* =====================================================================
+   render helpers
+   ===================================================================== */
+function el(name, attrs, parent){
+  const n = document.createElementNS(SVGNS, name);
+  for(const k in attrs) n.setAttribute(k, attrs[k]);
+  if(parent) parent.appendChild(n);
+  return n;
+}
+function txt(x,y,str,attrs,parent){
+  const t = el("text", Object.assign({x,y}, attrs), parent);
+  t.textContent = str;
+  return t;
+}
+const css = v => `var(${v})`;
+
+/* ---------- background bands + lane guides ---------- */
+const gBands = el("g",{},stage);
+BANDS.forEach((b,i)=>{
+  el("rect",{x:b.x0,y:40,width:b.x1-b.x0,height:250,rx:10,
+    fill: i%2 ? css("--navy-tint-2") : "transparent", opacity: i%2 ? .55 : 0},gBands);
+  txt(b.x0+10,30,b.label,{fill:css("--muted-soft"),"font-size":"10.5px","letter-spacing":".14em",
+    "font-weight":"600",class:"t-mono"},gBands);
+});
+/* machine rail */
+el("line",{x1:80,y1:MACH_Y,x2:4140,y2:MACH_Y,stroke:css("--lane-machine-soft"),"stroke-width":3,
+  "stroke-linecap":"round"},stage);
+/* dashed rail after handoff = fire-and-forget */
+el("line",{x1:2720,y1:MACH_Y,x2:4140,y2:MACH_Y,stroke:css("--lane-machine"),"stroke-width":3,
+  "stroke-dasharray":"6 7","stroke-linecap":"round"},stage);
+txt(84,MACH_Y-84,"THE MACHINE",{fill:css("--navy-soft"),class:"lane-label","letter-spacing":".18em","font-size":"11px","font-weight":"700"},stage);
+txt(2740,MACH_Y+92,"⇢ detached from here: nobody is watching (except the watchdog 🐕)",
+  {fill:css("--muted-soft"),"font-size":"11.5px","font-style":"italic"},stage);
+
+/* customer rail — the long quiet */
+el("rect",{x:80,y:CUST_Y-26,width:4060,height:52,rx:26,fill:css("--quiet")},stage);
+txt(84,CUST_Y-42,"WHAT THE CUSTOMER SEES",{fill:css("--quiet-ink"),class:"lane-label","letter-spacing":".18em","font-size":"11px","font-weight":"700"},stage);
+const quiet = el("g",{},stage);
+txt(1300,CUST_Y+5,"…the long quiet: no row (Create) · stale row (Update) · no status · no spinner · nothing…",
+  {fill:css("--quiet-ink"),"font-size":"13px","font-style":"italic","text-anchor":"middle"},quiet);
+["1900","2050","2200"].forEach((x,i)=>{
+  txt(+x, CUST_Y-4-6*i, "z", {fill:css("--quiet-ink"),"font-size":`${12+3*i}px`,class:"zz",
+    style:`animation-delay:${i*.5}s`},quiet);
+});
+
+/* ---------- stations ---------- */
+const drawer = document.getElementById("drawer");
+function showDetail(o, laneChip){
+  const conf = o.conf==="high"?["conf-high","HIGH confidence"]:
+               o.conf==="med" ?["conf-med","MED confidence"]:["conf-approx","approximate"];
+  drawer.innerHTML =
+   `<div class="d-head"><h3>${o.icon?o.icon+" ":""}${o.title}</h3>
+      <span class="chip ${laneChip==="machine"?"machine":"customer"}">${laneChip==="machine"?"machine lane":"customer-visible"}</span>
+      ${o.t?`<span class="chip timing">${o.t}</span>`:""}
+      <span class="chip ${conf[0]}">${conf[1]}</span></div>
+    <div class="d-body">${o.d}</div>
+    <div class="src">source: ${o.src}</div>`;
+}
+STATIONS.forEach(s=>{
+  const g = el("g",{class:"station",tabindex:"0",role:"button","aria-label":s.title},stage);
+  el("line",{x1:s.x,y1:MACH_Y,x2:s.x,y2:MACH_Y-26,stroke:css("--lane-machine-soft"),"stroke-width":1.5},g);
+  el("circle",{cx:s.x,cy:MACH_Y,r:7,fill:css("--paper"),stroke:css("--lane-machine"),"stroke-width":2.5,class:"st-bubble"},g);
+  const bub = el("circle",{cx:s.x,cy:MACH_Y-52,r:24,fill:css("--card"),stroke:css("--rule"),
+    "stroke-width":1.5,class:"st-bubble"},g);
+  if(s.id==="handoff") bub.setAttribute("stroke",css("--orange-ink"));
+  txt(s.x,MACH_Y-44,s.icon,{"text-anchor":"middle","font-size":"22px"},g);
+  txt(s.x,MACH_Y+30,s.title,{fill:css("--navy"),"text-anchor":"middle","font-size":"13px","font-weight":"600"},g);
+  txt(s.x,MACH_Y+47,s.sub,{fill:css("--muted"),"text-anchor":"middle","font-size":"10px",class:"t-mono"},g);
+  txt(s.x,MACH_Y+64,s.t,{fill:css("--muted-soft"),"text-anchor":"middle","font-size":"10px",class:"t-mono"},g);
+  const open = ()=>showDetail(s,"machine");
+  g.addEventListener("click",open);
+  g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
+});
+
+/* ---------- milestone flags on the customer lane ---------- */
+MILESTONES.forEach(m=>{
+  const g = el("g",{class:"milestone",tabindex:"0",role:"button","aria-label":m.title},stage);
+  /* connector from machine lane to customer lane */
+  el("line",{x1:m.x,y1:MACH_Y+72,x2:m.x,y2:CUST_Y-34,stroke:css("--orange-ink"),"stroke-width":1.5,
+    "stroke-dasharray":m.approx?"3 5":"none",opacity:.8},g);
+  const flag = el("g",{class:"ms-flag"},g);
+  el("circle",{cx:m.x,cy:CUST_Y,r:19,fill:css("--orange"),stroke:m.approx?css("--orange-ink"):"none",
+    "stroke-width":m.approx?1.6:0,"stroke-dasharray":m.approx?"4 4":"none"},flag);
+  txt(m.x,CUST_Y+6,m.flag,{"text-anchor":"middle","font-size":"16px"},flag);
+  txt(m.x,CUST_Y+42,m.label,{fill:css("--navy"),"text-anchor":"middle","font-size":"12px","font-weight":"600"},g);
+  if(m.approx) txt(m.x,CUST_Y+58,"placement approximate",{fill:css("--muted-soft"),"text-anchor":"middle","font-size":"9.5px","font-style":"italic"},g);
+  const open = ()=>showDetail(Object.assign({icon:m.flag},m),"customer");
+  g.addEventListener("click",open);
+  g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
+});
+
+/* B/C fuzzy bracket */
+el("path",{d:`M 3300 ${CUST_Y+70} C 3300 ${CUST_Y+92}, 3560 ${CUST_Y+92}, 3560 ${CUST_Y+70}`,
+  fill:"none",stroke:css("--muted-soft"),"stroke-width":1.2,"stroke-dasharray":"3 4"},stage);
+txt(3430,CUST_Y+108,"B ↔ C order varies by tenant flag — even J2 isn't 100% sure",
+  {fill:css("--muted-soft"),"text-anchor":"middle","font-size":"10.5px","font-style":"italic"},stage);
+
+/* ---------- gremlin hazards ---------- */
+const gHaz = el("g",{id:"hazards",visibility:"hidden"},stage);
+HAZARDS.forEach(h=>{
+  const g = el("g",{class:"hazard",tabindex:"0",role:"button","aria-label":h.title},gHaz);
+  el("line",{x1:h.x,y1:MACH_Y+72,x2:h.x+46,y2:MACH_Y+118,stroke:css("--bad"),"stroke-width":1.6,
+    "stroke-dasharray":"4 4"},g);
+  el("circle",{cx:h.x+56,cy:MACH_Y+128,r:14,fill:css("--card"),stroke:css("--bad"),"stroke-width":1.8},g);
+  txt(h.x+56,MACH_Y+133,"✗",{fill:css("--bad"),"text-anchor":"middle","font-size":"14px","font-weight":"700"},g);
+  txt(h.x+80,MACH_Y+124,h.label,{fill:css("--bad"),"font-size":"11px","font-weight":"600"},g);
+  txt(h.x+80,MACH_Y+139,h.mail?"📧 error email":"🔇 no email",{fill:css("--muted"),"font-size":"10.5px",class:"t-mono"},g);
+  const open = ()=>showDetail({icon:"😈",title:h.title,d:h.d,src:h.src,t:h.mail?"emails customer":"silent",conf:"high"},"machine");
+  g.addEventListener("click",open);
+  g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();open();}});
+});
+/* watchdog mascot (visible always, below the hazard row) */
+const dog = el("g",{class:"float"},stage);
+txt(3322,MACH_Y+168,"🐕",{"font-size":"20px"},dog);
+txt(3352,MACH_Y+158,"watchdog: internal bark at 12 h",
+  {fill:css("--muted-soft"),"font-size":"10.5px",class:"t-mono"},dog);
+txt(3352,MACH_Y+174,"📧 (maybe falsely) at 48 h",
+  {fill:css("--muted-soft"),"font-size":"10.5px",class:"t-mono"},dog);
+
+/* ---------- Netty the CSV + customer avatar ---------- */
+const netty = el("g",{id:"netty"},stage);
+(function buildNetty(){
+  const b = el("g",{},netty);
+  el("rect",{x:-16,y:-22,width:32,height:40,rx:5,fill:css("--card"),stroke:css("--navy"),"stroke-width":2},b);
+  el("path",{d:"M 6 -22 L 16 -12 L 6 -12 Z",fill:css("--orange")},b);           /* dog-ear */
+  el("line",{x1:-9,y1:-4,x2:9,y2:-4,stroke:css("--navy-tint"),"stroke-width":2},b);
+  el("line",{x1:-9,y1:2,x2:9,y2:2,stroke:css("--navy-tint"),"stroke-width":2},b);
+  el("line",{x1:-9,y1:8,x2:4,y2:8,stroke:css("--navy-tint"),"stroke-width":2},b);
+  el("circle",{cx:-5,cy:-13,r:2,fill:css("--navy")},b);                          /* eyes */
+  el("circle",{cx:5,cy:-13,r:2,fill:css("--navy")},b);
+  el("path",{d:"M -4 -8 Q 0 -5 4 -8",fill:"none",stroke:css("--navy"),"stroke-width":1.6,"stroke-linecap":"round"},b); /* smile */
+})();
+const avatar = el("g",{},stage);
+txt(30,CUST_Y+8,"🧑‍💻",{"font-size":"24px"},avatar);
+
+/* mail plane (animated on milestone fire) */
+const plane = el("g",{id:"plane",visibility:"hidden"},stage);
+txt(0,0,"✈️",{"font-size":"18px","text-anchor":"middle"},plane);
+
+/* confetti burst at D */
+const confetti = el("g",{id:"confetti"},stage);
+
+/* =====================================================================
+   the run: scrub + play
+   ===================================================================== */
+const scrubber = document.getElementById("scrubber");
+const playBtn  = document.getElementById("playBtn");
+const clock    = document.getElementById("clock");
+const stageScroll = document.getElementById("stageScroll");
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* progress p∈[0,1] → x along machine rail, and a stylized clock */
+const X0=150, X1=4040;
+const px = p => X0 + p*(X1-X0);
+/* piecewise stylized minutes for a typical run */
+const CLOCKMAP = [ /* [p, minutes, label] */
+  [0.00, 0,  "uploaded"],
+  [0.065,1,  "records created · 📧 #1 sent"],
+  [0.15, 8,  "waiting in queue…"],
+  [0.24, 10, "formatting"],
+  [0.31, 14, "building universe · geocoding"],
+  [0.38, 17, "validating"],
+  [0.44, 19, "combining & deduping"],
+  [0.51, 25, "computing distance matrix"],
+  [0.59, 30, "migrating to Postgres"],
+  [0.66, 32, "handoff — chain detached"],
+  [0.735,36, "scoring (dbt)"],
+  [0.81, 42, "reporting hop (the slow one)"],
+  [0.875,44, "adequacy tables filling"],
+  [0.93, 45, "bookkeeping"],
+  [1.00, 46, "📧 ready! 🎉"],
+];
+function clockAt(p){
+  for(let i=CLOCKMAP.length-1;i>=0;i--){
+    if(p>=CLOCKMAP[i][0]){
+      const a=CLOCKMAP[i], b=CLOCKMAP[Math.min(i+1,CLOCKMAP.length-1)];
+      const f=(b[0]===a[0])?0:(p-a[0])/(b[0]-a[0]);
+      return {min:Math.round(a[1]+(b[1]-a[1])*f), label:a[2]};
+    }
+  }
+  return {min:0,label:"uploaded"};
+}
+/* milestone fire points */
+const FIRES = [
+  {p:0.065, x:400,  kind:"mail"},
+  {p:0.655, x:2790, kind:"flag"},
+  {p:0.81,  x:3300, kind:"flag"},
+  {p:0.875, x:3560, kind:"flag"},
+  {p:0.985, x:4040, kind:"mail"},
+];
+let fired = new Set();
+
+function burstConfetti(x,y){
+  if(reduceMotion) return;
+  confetti.innerHTML="";
+  const colors=[css("--orange"),css("--navy-soft"),css("--good"),css("--orange-soft")];
+  for(let i=0;i<26;i++){
+    const c = el("circle",{cx:x,cy:y,r:2.4+Math.random()*2.4,fill:colors[i%4]},confetti);
+    const dx=(Math.random()-.5)*220, dy=-40-Math.random()*130, dur=700+Math.random()*700;
+    c.animate([{transform:"translate(0,0)",opacity:1},
+               {transform:`translate(${dx}px,${dy+90}px)`,opacity:0}],
+              {duration:dur,easing:"cubic-bezier(.17,.67,.3,1)",fill:"forwards"});
+  }
+  setTimeout(()=>{confetti.innerHTML="";},1700);
+}
+function flyPlane(x){
+  if(reduceMotion) return;
+  plane.setAttribute("visibility","visible");
+  plane.animate([{transform:`translate(${x}px,${MACH_Y+40}px) rotate(20deg)`},
+                 {transform:`translate(${x+22}px,${CUST_Y-30}px) rotate(45deg)`}],
+    {duration:650,easing:"ease-in",fill:"forwards"}).onfinish=()=>plane.setAttribute("visibility","hidden");
+}
+
+function setProgress(p, animateEvents){
+  const x = px(p);
+  /* Netty rides the machine rail, hops down to customer lane at the very end */
+  const y = p>0.985 ? MACH_Y + (CUST_Y-MACH_Y)*((p-0.985)/0.015)*0.82 : MACH_Y;
+  netty.setAttribute("transform",`translate(${x},${y-34})`);
+  const c = clockAt(p);
+  clock.innerHTML = `T+<b>${c.min} min</b> · ${c.label}`;
+  /* fire events */
+  FIRES.forEach(f=>{
+    if(p>=f.p && !fired.has(f.p)){
+      fired.add(f.p);
+      if(animateEvents){ flyPlane(f.x); if(f.p>0.98) burstConfetti(f.x,CUST_Y-40); }
+    }
+    if(p<f.p) fired.delete(f.p);
+  });
+  /* keep Netty in view while playing */
+  if(playing && !reduceMotion){
+    const target = x*stageScale() - stageScroll.clientWidth*0.45;
+    stageScroll.scrollLeft = Math.max(0, target);
+  }
+}
+function stageScale(){
+  /* svg is fixed 4240 wide; account for any CSS scaling (none by default) */
+  return stage.getBoundingClientRect().width / W;
+}
+
+let playing=false, rafId=null, p=0;
+const DURATION = 32000; /* ms for a full run */
+let lastT=null;
+function tick(t){
+  if(lastT==null) lastT=t;
+  p += (t-lastT)/DURATION;
+  lastT=t;
+  if(p>=1){p=1; pause();}
+  scrubber.value = Math.round(p*1000);
+  setProgress(p,true);
+  if(playing) rafId=requestAnimationFrame(tick);
+}
+function play(){
+  if(reduceMotion){ /* no auto-animation: jump through checkpoints instead */
+    p = p>=1 ? 0 : Math.min(1, p+0.125);
+    scrubber.value=Math.round(p*1000); setProgress(p,false); return;
+  }
+  if(p>=1){p=0; fired.clear();}
+  playing=true; lastT=null; playBtn.textContent="⏸ Pause";
+  rafId=requestAnimationFrame(tick);
+}
+function pause(){
+  playing=false; if(rafId) cancelAnimationFrame(rafId);
+  playBtn.textContent = p>=1 ? "↻ Run it again" : "▶ Resume";
+}
+playBtn.addEventListener("click",()=> playing?pause():play());
+scrubber.addEventListener("input",()=>{
+  pause(); p=scrubber.value/1000; setProgress(p,false);
+});
+setProgress(0,false);
+
+/* gremlin mode */
+const gremlinBtn=document.getElementById("gremlinBtn");
+gremlinBtn.addEventListener("click",()=>{
+  const on = gremlinBtn.getAttribute("aria-pressed")==="true";
+  gremlinBtn.setAttribute("aria-pressed", String(!on));
+  document.getElementById("hazards").setAttribute("visibility", on?"hidden":"visible");
+  if(!on){
+    showDetail({icon:"😈",title:"Gremlin mode: the failure exits",conf:"high",t:"error path",
+      d:`<p>Red ✗ exits show where a run can die — and whether the customer hears about it. The uncomfortable
+         truth: an error <b>email is not guaranteed</b> (5 send sites vs at least 7 silent paths, no dedup), and
+         there is <b>no in-app error state today</b>. The database's <code>errored_at</code> is more trustworthy
+         than your inbox.</p>`,
+      src:"error-email audit C0BCGMG0YDR · watchdog tiers #2807"},"machine");
+  }
+});
+</script>
+</body>
+</html>
