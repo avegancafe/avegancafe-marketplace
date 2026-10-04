@@ -28,12 +28,8 @@ jobs:
           echo "marketplace.json $manifest · CHANGELOG $changelog"
           test "$manifest" = "$changelog"
 
-      - name: Vendored plugin versions match their entries
-        run: |
-          status=0
-          while read -r name src version; do
-            actual=$(jq -r .version "$src/.claude-plugin/plugin.json")
-            if [ "$actual" = "$version" ]; then echo "ok   $name $version"
-            else echo "FAIL $name: marketplace.json says $version, $src says $actual"; status=1; fi
-          done < <(jq -r '.plugins[] | select(.source | type == "string") | "\(.name) \(.source) \(.version)"' .claude-plugin/marketplace.json)
-          exit $status
+      - name: Validate vendored plugins
+        run: for p in plugins/*/; do echo "== $p"; claude plugin validate "$p"; done
+
+      - name: Shellcheck scripts
+        run: shellcheck scripts/*.sh plugins/*/scripts/*.sh

@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.3] - 2026-10-04
+
+### Added
+- **Automatic plugin-version sync** (`.github/workflows/sync-plugin-versions.yml` + `scripts/sync-plugin-version.sh`). External plugins send a `plugin-released` repository_dispatch from their `main`; vendored plugins sync when their `plugin.json` changes on `main`. Each sync sets the entry's version, bumps `metadata.version` (patch), adds a CHANGELOG entry, validates, and commits to `main`.
+- CI validates each vendored plugin and shellchecks all scripts.
+
+### Changed
+- `kitchen-brigade` entry → 1.1.0 — the index had drifted at 1.0.3 since kitchen-brigade 1.1.0 shipped on 2026-07-20.
+
+### Removed
+- CI's "vendored plugin versions match their entries" check — the sync workflow now makes them match on merge, so a PR bumping a vendored plugin no longer needs a hand-edited entry.
+
 ## [1.2.2] - 2026-10-04
 
 ### Changed
