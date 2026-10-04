@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-10-04
+
+### Added
+- CI (`.github/workflows/ci.yml`): `claude plugin validate`, `metadata.version` ↔ CHANGELOG sync, and vendored plugins' `plugin.json` versions ↔ their marketplace entries.
+
+### Changed
+- `beadwork` entry → 2.0.2 (adds its own CI).
+
 ## [1.2.0] - 2026-10-04
 
 ### Changed

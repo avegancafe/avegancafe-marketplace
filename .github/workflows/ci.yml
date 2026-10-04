@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate marketplace
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate .
+
+      - name: Version matches CHANGELOG
+        run: |
+          manifest=$(jq -r .metadata.version .claude-plugin/marketplace.json)
+          changelog=$(grep -m1 -oE '^## \[[0-9]+\.[0-9]+\.[0-9]+\]' CHANGELOG.md | tr -d '#[] ')
+          echo "marketplace.json $manifest · CHANGELOG $changelog"
+          test "$manifest" = "$changelog"
+
+      - name: Vendored plugin versions match their entries
+        run: |
+          status=0
+          while read -r name src version; do
+            actual=$(jq -r .version "$src/.claude-plugin/plugin.json")
+            if [ "$actual" = "$version" ]; then echo "ok   $name $version"
+            else echo "FAIL $name: marketplace.json says $version, $src says $actual"; status=1; fi
+          done < <(jq -r '.plugins[] | select(.source | type == "string") | "\(.name) \(.source) \(.version)"' .claude-plugin/marketplace.json)
+          exit $status
