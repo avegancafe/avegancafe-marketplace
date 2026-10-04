@@ -54,7 +54,7 @@ README.md
 
 External plugins use a `url` source pointing at the plugin's **own private
 repo** over SSH — those are NOT vendored here (`avegancafe/kitchen-brigade`
-and `avegancafe/avegancafe-plugin`).
+and `avegancafe/beadwork`).
 
 ```json
 {
@@ -64,9 +64,9 @@ and `avegancafe/avegancafe-plugin`).
 }
 ```
 
-> Note: the `avegancafe` plugin lives in the **`avegancafe-plugin`** repo
-> (`avegancafe/avegancafe` is taken by the GitHub profile README). The plugin's
-> installable name is still `avegancafe`.
+> Note: `beadwork` was the `avegancafe` grab-bag plugin (repo
+> `avegancafe/avegancafe-plugin`) until 2.0.0, when it became a dedicated beads
+> plugin. GitHub redirects the old repo URL, but sources use the new one.
 
 Vendored plugins (`projects`, `session-ids`) use a relative-path source:
 

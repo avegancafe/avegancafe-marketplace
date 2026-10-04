@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-04
+
+### Changed
+- **`avegancafe` → `beadwork` (2.0.0).** The grab-bag plugin held only beads tooling, so it's renamed to a dedicated beads plugin; its repo is now `avegancafe/beadwork`. Adds the beadwork pane (a mod showing Claude's task list and open beads, `/beadwork`); skills renamed to `beadwork:logging-captures` and `beadwork:writing-titles`. Reinstall as `beadwork@avegancafe-marketplace` and disable `avegancafe@avegancafe-marketplace`.
+
 ## [1.1.0] - 2026-07-17
 
 ### Added

@@ -30,7 +30,7 @@ python3 -m json.tool .claude-plugin/marketplace.json
 ```bash
 /plugin marketplace add avegancafe/avegancafe-marketplace
 /plugin install kitchen-brigade@avegancafe-marketplace
-/plugin install avegancafe@avegancafe-marketplace
+/plugin install beadwork@avegancafe-marketplace
 ```
 
 See [`CLAUDE.md`](CLAUDE.md) for the full maintainer guide and the pattern-library table of contents.
