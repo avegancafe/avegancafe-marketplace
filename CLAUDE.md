@@ -10,10 +10,21 @@ Guidance for Claude Code when working **on this repository**.
    [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) (semver) and
    add a matching entry to [`CHANGELOG.md`](CHANGELOG.md). Docs-only changes bump
    the patch version too.
-2. **Keep each plugin entry's `version` in sync** with the `version` in that
-   plugin repo's `.claude-plugin/plugin.json`. When a plugin releases, bump its
-   entry here in the same change. The marketplace must never advertise a version
-   the plugin repo doesn't have.
+2. **Don't hand-edit plugin entry versions — they sync automatically.** When a
+   plugin's version changes on its `main`, `.github/workflows/sync-plugin-versions.yml`
+   sets that entry's `version`, bumps `metadata.version` (patch), adds a CHANGELOG
+   entry, and commits to `main` as `github-actions[bot]`:
+   - **External plugins** (own repos) trigger it with a `plugin-released`
+     repository_dispatch sent by their own `release.yml`, authenticated by their
+     `MARKETPLACE_DISPATCH_TOKEN` secret (fine-grained PAT, this repo only,
+     Contents: read & write).
+   - **Vendored plugins** (`plugins/*`) trigger it when their `plugin.json` changes
+     on `main`.
+   - To resync by hand: Actions → *Sync plugin versions* → Run workflow (name +
+     version, or blank to sync every vendored plugin), or run
+     `scripts/sync-plugin-version.sh <name> <version>` locally.
+   The marketplace must never advertise a version the plugin doesn't have; if an
+   entry looks stale, check that plugin's last `release.yml` run first.
 3. **Use SSH `git@github.com:...` URLs.** All repos are private; SSH is the
    configured auth. Don't rewrite sources to HTTPS.
 
@@ -44,6 +55,9 @@ under `plugins/` and referenced with relative-path sources.
 ```
 .claude-plugin/marketplace.json   # The index: name, owner, metadata, plugins[]. REQUIRED.
 .claude/patterns/                 # Durable repo patterns (see ToC above)
+.github/workflows/ci.yml          # Validate index + vendored plugins, version sync, shellcheck
+.github/workflows/sync-plugin-versions.yml  # Auto-sync entry versions (see rule 2)
+scripts/sync-plugin-version.sh    # The sync itself: entry version + metadata bump + CHANGELOG
 plugins/                          # Plugins vendored in this repo
   projects/                       # _projects/ folder manager (skills + scripts)
   session-ids/                    # readable session ids (SessionStart hook + skills)
