@@ -10,20 +10,33 @@ plugin repos. It holds no plugin code.
 1. `metadata.version` in [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) (semver)
 2. A new entry in [`CHANGELOG.md`](CHANGELOG.md)
 
-When a **plugin** releases, also bump that plugin's entry `version` here so the
-marketplace and the plugin's own `plugin.json` always agree.
+**Plugin entry versions are not yours to bump** — when a plugin releases, the
+*Sync plugin versions* workflow updates its entry, `metadata.version`, and this
+CHANGELOG on `main` by itself (see rule 2 in [`CLAUDE.md`](CLAUDE.md)).
 
 ## Adding or updating a plugin
 
 - Add/edit an entry in `plugins[]`. The `name` must match the plugin's `plugin.json` `name`.
 - Use an SSH `url` source: `git@github.com:avegancafe/<repo>.git` (all repos are private).
-- Set `version` to match the plugin repo's current `plugin.json` version.
+- Set `version` to match the plugin repo's current `plugin.json` version (once, when
+  adding it; the sync keeps it current after that).
+- **External plugin:** copy `release.yml` from `avegancafe/beadwork`
+  (`.github/workflows/release.yml`) into the new repo and set its
+  `MARKETPLACE_DISPATCH_TOKEN` secret (`gh secret set MARKETPLACE_DISPATCH_TOKEN -R avegancafe/<repo>`,
+  same fine-grained PAT: this repo only, Contents read & write). Without it the
+  entry silently stops tracking releases.
+- **Vendored plugin** (`plugins/<name>/`): nothing extra — its `plugin.json` changing
+  on `main` triggers the sync.
 
 ## Validation
 
 ```bash
-python3 -m json.tool .claude-plugin/marketplace.json
+claude plugin validate .                                  # the index
+for p in plugins/*/; do claude plugin validate "$p"; done  # vendored plugins
+shellcheck scripts/*.sh plugins/*/scripts/*.sh
 ```
+
+CI runs all three on every PR (`.github/workflows/ci.yml`).
 
 ## Testing
 

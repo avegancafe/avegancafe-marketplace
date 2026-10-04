@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.6] - 2026-10-04
+
+### Changed
+- Docs: CONTRIBUTING no longer asks for hand-bumped plugin entries, explains wiring `release.yml` + `MARKETPLACE_DISPATCH_TOKEN` for a new external plugin, and validates with `claude plugin validate` instead of `json.tool`. CLAUDE.md points new external plugins at that checklist.
+
 ## [1.2.5] - 2026-10-04
 
 ### Changed

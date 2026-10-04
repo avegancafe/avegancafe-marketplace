@@ -82,6 +82,10 @@ and `avegancafe/beadwork`).
 > `avegancafe/avegancafe-plugin`) until 2.0.0, when it became a dedicated beads
 > plugin. GitHub redirects the old repo URL, but sources use the new one.
 
+Adding an **external** plugin also means wiring its release notification — see
+"Adding or updating a plugin" in [`CONTRIBUTING.md`](CONTRIBUTING.md); without it the
+entry's version silently stops tracking releases.
+
 Vendored plugins (`projects`, `session-ids`) use a relative-path source:
 
 ```json
