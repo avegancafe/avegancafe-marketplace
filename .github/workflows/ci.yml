@@ -32,4 +32,4 @@ jobs:
         run: for p in plugins/*/; do echo "== $p"; claude plugin validate "$p"; done
 
       - name: Shellcheck scripts
-        run: shellcheck scripts/*.sh plugins/*/scripts/*.sh
+        run: find scripts plugins -name '*.sh' -print0 | xargs -0 -r shellcheck

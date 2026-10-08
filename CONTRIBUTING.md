@@ -33,7 +33,7 @@ CHANGELOG on `main` by itself (see rule 2 in [`CLAUDE.md`](CLAUDE.md)).
 ```bash
 claude plugin validate .                                  # the index
 for p in plugins/*/; do claude plugin validate "$p"; done  # vendored plugins
-shellcheck scripts/*.sh plugins/*/scripts/*.sh
+find scripts plugins -name '*.sh' -print0 | xargs -0 -r shellcheck
 ```
 
 CI runs all three on every PR (`.github/workflows/ci.yml`).

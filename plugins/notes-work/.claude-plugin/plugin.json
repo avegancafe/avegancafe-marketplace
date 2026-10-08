@@ -1,9 +1,0 @@
-{
-  "name": "notes-work",
-  "version": "1.0.0",
-  "description": "Teaches Claude about Kyle's private Obsidian work vault (avegancafe/notes--work): its layout and conventions, and how to search and mine the weekly-synced Granola meeting archive (summaries, transcripts, attendees) it holds.",
-  "author": {
-    "name": "Kyle Holzinger",
-    "url": "https://github.com/avegancafe"
-  }
-}

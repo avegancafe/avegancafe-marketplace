@@ -59,9 +59,7 @@ under `plugins/` and referenced with relative-path sources.
 .github/workflows/sync-plugin-versions.yml  # Auto-sync entry versions (see rule 2)
 scripts/sync-plugin-version.sh    # The sync itself: entry version + metadata bump + CHANGELOG
 plugins/                          # Plugins vendored in this repo
-  projects/                       # _projects/ folder manager (skills + scripts)
-  session-ids/                    # readable session ids (SessionStart hook + skills)
-  notes-work/                     # notes--work vault + Granola archive knowledge (skill only)
+  avegancafe/                     # Kyle's personal plugin for one-off skills (e.g. work-notes-vault)
 README.md
 ```
 
@@ -81,18 +79,20 @@ and `avegancafe/beadwork`).
 
 > Note: `beadwork` was the `avegancafe` grab-bag plugin (repo
 > `avegancafe/avegancafe-plugin`) until 2.0.0, when it became a dedicated beads
-> plugin. GitHub redirects the old repo URL, but sources use the new one.
+> plugin. GitHub redirects the old repo URL, but sources use the new one. The vendored
+> `plugins/avegancafe/` plugin (added in marketplace 2.0.0) is a new, unrelated
+> plugin that reuses the name.
 
 Adding an **external** plugin also means wiring its release notification — see
 "Adding or updating a plugin" in [`CONTRIBUTING.md`](CONTRIBUTING.md); without it the
 entry's version silently stops tracking releases.
 
-Vendored plugins (`projects`, `session-ids`, `notes-work`) use a relative-path source:
+Vendored plugins (`avegancafe`) use a relative-path source:
 
 ```json
 {
-  "name": "projects",
-  "source": "./plugins/projects",
+  "name": "avegancafe",
+  "source": "./plugins/avegancafe",
   "version": "1.0.0"
 }
 ```
