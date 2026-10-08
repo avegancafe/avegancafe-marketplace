@@ -4,6 +4,17 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-10-08
+
+### Added
+- `avegancafe` vendored plugin (1.0.0) — Kyle's personal plugin for one-off skills (unrelated to the old `avegancafe` plugin that became `beadwork`). Ships the `work-notes-vault` skill: where Kyle's private Obsidian work vault (`avegancafe/notes--work`) lives, its layout, and how to search/mine its weekly-synced Granola meeting archive (`granola/notes/`, `.md` + raw `.json`) with `rg`/`jq`. Structure only — no meeting content.
+
+### Removed
+- **Breaking:** the vendored `projects` and `session-ids` plugins and their marketplace entries. Uninstall them (`/plugin uninstall projects@avegancafe-marketplace`, `/plugin uninstall session-ids@avegancafe-marketplace`).
+
+### Changed
+- CI and CONTRIBUTING shellcheck every `*.sh` under `scripts/` and `plugins/` via `find`, so the step no longer fails when no vendored plugin has scripts.
+
 ## [1.2.11] - 2026-10-06
 
 ### Changed
