@@ -61,6 +61,7 @@ scripts/sync-plugin-version.sh    # The sync itself: entry version + metadata bu
 plugins/                          # Plugins vendored in this repo
   projects/                       # _projects/ folder manager (skills + scripts)
   session-ids/                    # readable session ids (SessionStart hook + skills)
+  notes-work/                     # notes--work vault + Granola archive knowledge (skill only)
 README.md
 ```
 
@@ -86,7 +87,7 @@ Adding an **external** plugin also means wiring its release notification — see
 "Adding or updating a plugin" in [`CONTRIBUTING.md`](CONTRIBUTING.md); without it the
 entry's version silently stops tracking releases.
 
-Vendored plugins (`projects`, `session-ids`) use a relative-path source:
+Vendored plugins (`projects`, `session-ids`, `notes-work`) use a relative-path source:
 
 ```json
 {
