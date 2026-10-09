@@ -1,9 +1,10 @@
 {
   "name": "avegancafe",
-  "version": "1.0.0",
-  "description": "Kyle's personal Claude plugin: a home for one-off skills that don't warrant their own plugin. Currently ships work-notes-vault, which teaches Claude about his private Obsidian work vault (avegancafe/notes--work) and how to search and mine its weekly-synced Granola meeting archive.",
+  "version": "1.1.0",
+  "description": "Kyle's personal Claude plugin: a home for one-offs that don't warrant their own plugin. Ships the work-notes-vault skill (his private Obsidian work vault and its Granola meeting archive) and a session-title mod that keeps session titles in `type(Scope): imperative summary` form, refined as the work grows.",
   "author": {
     "name": "Kyle Holzinger",
     "url": "https://github.com/avegancafe"
-  }
+  },
+  "types": "./types/index.d.ts"
 }

@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-10-09
+
+### Added
+- `avegancafe` 1.1.0 — `session-title` mod: names each session `feat|fix|chore(Scope): imperative summary` on its first prompt (Haiku), refines the title in the background after every main-thread turn, and applies the refinement on the next prompt. A hand rename pauses it; `/session-title` shows the title, `/session-title lock|unlock` toggles it.
+
 ## [2.0.0] - 2026-10-08
 
 ### Added
