@@ -4,11 +4,6 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.2.0] - 2026-10-11
-
-### Added
-- `rea` 6.4.0 — my fork `avegancafe/rea` of `morluto/rea` (Reverse Engineer Anything). The repo has no `plugin.json`, so the entry is `strict: false` and declares the `reverse-engineer-anything` skill and the `rea` MCP server (`npx -y rea-agents@latest mcp`) inline. The fork has no `release.yml` dispatch, so its entry version is not auto-synced.
-
 ## [2.1.0] - 2026-10-09
 
 ### Added

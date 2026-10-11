@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "2.2.0"
+    "version": "2.1.0"
   },
   "plugins": [
     {
@@ -36,30 +36,6 @@
       "version": "1.1.0",
       "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). Mods: session-title (auto-names sessions `feat|fix|chore(Scope): imperative summary`, refined after each turn).",
       "category": "productivity"
-    },
-    {
-      "name": "rea",
-      "source": {
-        "source": "url",
-        "url": "git@github.com:avegancafe/rea.git"
-      },
-      "version": "6.4.0",
-      "description": "My fork of morluto/rea — Reverse Engineer Anything. Bundles the REA MCP server (via the rea-agents npm package) and the reverse-engineer-anything skill for inspecting native binaries, JavaScript/Electron apps, .NET assemblies, and websites.",
-      "category": "development",
-      "strict": false,
-      "skills": [
-        "./.agents/skills/reverse-engineer-anything"
-      ],
-      "mcpServers": {
-        "rea": {
-          "command": "npx",
-          "args": [
-            "-y",
-            "rea-agents@latest",
-            "mcp"
-          ]
-        }
-      }
     }
   ]
 }
