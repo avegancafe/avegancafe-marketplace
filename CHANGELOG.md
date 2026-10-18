@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2026-10-18
+
+### Added
+- `avegancafe` 1.2.0 — `side-quest` skill: when Claude notices a worthwhile problem the current task doesn't need fixed (an unrelated bug, security risk, stale test, misleading doc, refactor with payoff), it asks once whether to spawn a side quest, then carries on with the main task. A yes launches a cold-start `claude --bg -n "type(Scope): summary" -w side-quest-<slug>` session with a self-contained prompt, in its own worktree. Blockers, already-requested work, in-diff typos and taste nits are handled in place instead.
+
 ## [2.1.1] - 2026-10-17
 
 ### Changed
