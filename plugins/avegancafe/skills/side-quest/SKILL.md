@@ -1,11 +1,11 @@
 ---
 name: side-quest
-description: Use when, partway through a task, you notice a worthwhile problem the current task does not need fixed — an unrelated bug, a security or data-loss risk, a stale or broken test, a misleading doc, dead code, a refactor that would pay off — and you feel the pull to either detour into it or let it slide.
+description: Use before finishing or summarizing any task during which you noticed a worthwhile problem outside its scope — a missing auth or permission check, a swallowed exception, a skipped or stale test, a README step that no longer works, an unrelated bug — instead of only mentioning it in your reply.
 ---
 
 # Side quest
 
-Stay on the main task, and still get tangential findings fixed: offer to hand each one to a **separate background Claude session** (`claude --bg`) that works it in its own worktree, while this session keeps going.
+Stay on the main task, and still get tangential findings fixed: offer to **fork** this session into a named background session (`claude --bg --resume … --fork-session`) that fixes it in the same folder while this session keeps going.
 
 ## Is it a side quest?
 
@@ -37,19 +37,22 @@ Otherwise handle it in place:
 
 ## Spawning
 
-The new session starts cold — it sees **none** of this conversation. Write its prompt to a fresh temp file (`PROMPT_FILE=$(mktemp)`) containing: the finding with `path:line` evidence, why it matters, what "done" looks like, a scope fence ("fix only this; don't touch <the main task's area>"), and how to finish (commit on its branch, push, open a draft PR if the repo uses them, end with a report).
+Fork **this** session into a named background session in the same folder. The fork inherits the whole conversation, so it already knows the finding, the evidence, and what you're doing — no handoff doc.
 
-Run from the repo root:
+Run from your current working directory:
 
 ```bash
-claude --bg -n "fix(Scope): imperative summary" -w side-quest-<slug> "$(cat "$PROMPT_FILE")"
+claude --bg --resume "$CLAUDE_CODE_SESSION_ID" --fork-session \
+  --name "fix(Scope): imperative summary" \
+  "You are a fork of this session. Your only job: <the finding, path:line>. Done = <what done looks like>. The original session is still working on <main task> in this same folder — touch only the files this fix needs; don't switch branches, stash, reset, or commit anything you didn't change. Leave your change uncommitted and end with the files you touched."
 ```
 
-- `-n` names the session in agents view — use `type(Scope): imperative summary`.
-- `-w` gives it its own git worktree and branch, so it can't collide with this session's edits. Drop `-w` outside a git repo.
+- `--resume … --fork-session` copies this conversation into a new session ID; the original keeps going untouched.
+- `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. Use `type(Scope): imperative summary`, e.g. `fix(Admin): require admin on delete_user`.
+- No `--worktree`: the fork shares this folder, so the scope fence in the prompt is what keeps the two from colliding. If the fix should become its own branch/PR instead, add `--worktree side-quest-<slug>` and tell it to commit and push there.
 - It prints `backgrounded · <id> · <name>`; tell the user `claude attach <id>` (or `←` in agent view) to look in.
 
-If it refuses with "Workspace not trusted", or `claude` isn't on PATH, fall back to **Note it for later** and tell the user why.
+If `$CLAUDE_CODE_SESSION_ID` is unset, or the command refuses ("Workspace not trusted", `claude` not on PATH), fall back to **Note it for later** and tell the user why.
 
 ## Common mistakes
 
@@ -59,5 +62,5 @@ If it refuses with "Workspace not trusted", or `claude` isn't on PATH, fall back
 | Silently ignoring it to stay focused | Ask. A one-line question costs the user seconds. |
 | Offering a fork for something the task needs | It's part of the task — fix it. |
 | Offering forks for nits | Mention or drop them; save forks for things worth a PR. |
-| A spawn prompt that says "fix the thing we saw" | The fork has no context — paste the evidence. |
+| A fork prompt without a scope fence | Both sessions share the folder — name the files it may touch and forbid branch/stash/commit moves. |
 | Waiting on the fork or checking on it | It reports on its own; carry on with the main task. |

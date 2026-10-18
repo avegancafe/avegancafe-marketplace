@@ -1,7 +1,7 @@
 {
   "name": "avegancafe",
-  "version": "1.2.0",
-  "description": "Kyle's personal Claude plugin: a home for one-offs that don't warrant their own plugin. Ships the work-notes-vault skill (his private Obsidian work vault and its Granola meeting archive), the side-quest skill (offers to hand tangential findings to a named `claude --bg` session in its own worktree, so the main session stays on task), and a session-title mod that keeps session titles in `type(Scope): imperative summary` form, refined as the work grows.",
+  "version": "1.3.0",
+  "description": "Kyle's personal Claude plugin: a home for one-offs that don't warrant their own plugin. Ships the work-notes-vault skill (his private Obsidian work vault and its Granola meeting archive), the side-quest skill plus a Stop hook (when Claude defers an out-of-scope finding, it offers to fork the session into a named background session that fixes it in the same folder), and a session-title mod that keeps session titles in `type(Scope): imperative summary` form, refined as the work grows.",
   "author": {
     "name": "Kyle Holzinger",
     "url": "https://github.com/avegancafe"

@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.0] - 2026-10-19
+
+### Changed
+- `avegancafe` 1.3.0 — `side-quest` now actually fires during organic work, and forks instead of cold-starting:
+  - **Trigger:** description re-keyed from an internal state ("you feel the pull…") to the observable moment ("before finishing or summarizing any task during which you noticed…"), plus a `Stop` hook (`hooks/side-quest-stop.sh`) that catches replies deferring an out-of-scope finding ("separately…", "left it alone…", "outside this change…") and asks Claude, once, whether it's a real side quest. Organic test (real `claude -p` sessions in fixture repos with planted issues, plain task prompts): invocation on exposed findings went 0/12 (1.2.0) → 12/12, with 0/10 on decoys (blockers, in-diff typos, "just list it", already-tracked, clean repo).
+  - **Spawn:** `claude --bg --resume "$CLAUDE_CODE_SESSION_ID" --fork-session --name "<type(Scope): summary>"` — the fork inherits the whole conversation and works in the same folder under a scope fence; `--worktree` only when the fix should be its own PR.
+
 ## [2.2.0] - 2026-10-18
 
 ### Added
