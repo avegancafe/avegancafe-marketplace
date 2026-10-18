@@ -44,13 +44,14 @@ Run from your current working directory:
 ```bash
 claude --bg --resume "$CLAUDE_CODE_SESSION_ID" --fork-session \
   --name "fix(Scope): imperative summary" \
-  "You are a fork of this session. Your only job: <the finding, path:line>. Done = <what done looks like>. The original session is still working on <main task> in this same folder — touch only the files this fix needs; don't switch branches, stash, reset, or commit anything you didn't change. Leave your change uncommitted and end with the files you touched."
+  "You are a fork of this session. Your only job: <the finding, path:line>. Done = <what done looks like>. The original session is still working on <main task> in this same folder — touch only the files this fix needs; don't switch branches, stash, reset, or commit anything you didn't change. Leave your change uncommitted and end with the files you touched. Don't start side quests of your own — list any further findings in your report."
 ```
 
 - `--resume … --fork-session` copies this conversation into a new session ID; the original keeps going untouched.
 - `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. Use `type(Scope): imperative summary`, e.g. `fix(Admin): require admin on delete_user`.
 - No `--worktree`: the fork shares this folder, so the scope fence in the prompt is what keeps the two from colliding. If the fix should become its own branch/PR instead, add `--worktree side-quest-<slug>` and tell it to commit and push there.
 - It prints `backgrounded · <id> · <name>`; tell the user `claude attach <id>` (or `←` in agent view) to look in.
+- **After forking, fence yourself too:** the fork's edits land in your working tree uncommitted. Stage only explicit paths from your own task (never `git add -A` / `git commit -a`) and leave the fork's files alone.
 
 If `$CLAUDE_CODE_SESSION_ID` is unset, or the command refuses ("Workspace not trusted", `claude` not on PATH), fall back to **Note it for later** and tell the user why.
 

@@ -4,6 +4,9 @@
 # wasn't invoked since the user's last prompt, block once and let Claude decide
 # whether it's a real side quest. Fails open: any missing input → exit 0.
 command -v jq >/dev/null || exit 0
+# Headless (-p / SDK) sessions can't ask the user, and a block would replace the
+# final result with this check's reply — skip unless explicitly enabled.
+case "${CLAUDE_CODE_ENTRYPOINT:-}" in sdk*) [ "${SIDE_QUEST_HOOK:-}" = 1 ] || exit 0 ;; esac
 input=$(cat)
 [ "$(jq -r '.stop_hook_active // false' <<<"$input")" = "true" ] && exit 0
 last=$(jq -r '.last_assistant_message // empty' <<<"$input")
