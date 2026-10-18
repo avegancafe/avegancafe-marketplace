@@ -51,7 +51,10 @@ Touch only what this fix needs. Commit on side-quest/<slug>, push, and open a dr
 ```
 
 - `--resume … --fork-session` copies this conversation into a new session ID; the original keeps going untouched.
-- `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. All three parts are yours to fill: `<type>` is `fix`, `feat` or `chore`; `<Scope>` is one PascalCase word for the area; the summary is imperative and lowercase — e.g. `fix(Admin): require admin on delete_user`.
+- `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. Fill in all three parts:
+  - `<type>` is exactly one of `fix`, `chore` or `feat` — never `refactor`, `docs`, `test` or anything else (a refactor or doc fix is `chore`).
+  - `<Scope>` is the domain the fix works in: the least common denominator that covers everything it touches (`Auth`, `Billing`, `Onboarding`), as one PascalCase word — never a file, function or path.
+  - `<imperative summary>` is lowercase, imperative, no trailing period — e.g. `fix(Auth): require admin to delete users`.
 - Don't pass `--worktree`: it worktrees the folder the session started in, which may be a parent like `~/workspace` rather than the repo. The worktree step in the prompt targets the right repo.
 - If the finding only exists on your current branch (not on the default branch), base the worktree on `HEAD` instead and say so in the prompt.
 - It prints `backgrounded · <id> · <name>`; tell the user `claude attach <id>` (or `←` in agent view) to look in.
