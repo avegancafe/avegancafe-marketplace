@@ -5,7 +5,7 @@ description: Use before finishing or summarizing any task during which you notic
 
 # Side quest
 
-Stay on the main task, and still get tangential findings fixed: offer to **fork** this session into a named background session (`claude --bg --resume … --fork-session`) that fixes it in the same folder while this session keeps going.
+Stay on the main task, and still get tangential findings fixed: offer to **fork** this session into a named background session (`claude --bg --resume … --fork-session`) that fixes it in its own git worktree of the affected repo while this session keeps going.
 
 ## Is it a side quest?
 
@@ -37,21 +37,24 @@ Otherwise handle it in place:
 
 ## Spawning
 
-Fork **this** session into a named background session in the same folder. The fork inherits the whole conversation, so it already knows the finding, the evidence, and what you're doing — no handoff doc.
+Fork **this** session into a named background session. The fork inherits the whole conversation, so it already knows the finding, the evidence, and what you're doing — no handoff doc. It does its work in a **git worktree of the repo the finding lives in**, so it never touches your working tree.
 
-Run from your current working directory:
+1. Find that repo's root: `git -C <dir of the finding's file> rev-parse --show-toplevel`. It may differ from your working directory — e.g. you started in `~/workspace` and the finding is in `~/workspace/<repo>`.
+2. Run from your current working directory, filling in every `<…>`:
 
 ```bash
 claude --bg --resume "$CLAUDE_CODE_SESSION_ID" --fork-session \
-  --name "fix(Scope): imperative summary" \
-  "You are a fork of this session. Your only job: <the finding, path:line>. Done = <what done looks like>. The original session is still working on <main task> in this same folder — touch only the files this fix needs; don't switch branches, stash, reset, or commit anything you didn't change. Leave your change uncommitted and end with the files you touched. Don't start side quests of your own — list any further findings in your report."
+  --name "<type>(<Scope>): <imperative summary>" \
+  "You are a fork of this session. Your only job: <the finding, path:line>. Done = <what done looks like>.
+First create a git worktree of the repo at <repo root> (not of your current directory): git -C <repo root> worktree add <repo root>/.claude/worktrees/side-quest-<slug> -b side-quest/<slug> <default branch, e.g. origin/main>. Do all reading, editing, testing and git work inside that worktree.
+Touch only what this fix needs. Commit on side-quest/<slug>, push, and open a draft PR if the repo uses them. Don't start side quests of your own — list any further findings in your report, which ends with the branch, PR link, and files changed."
 ```
 
 - `--resume … --fork-session` copies this conversation into a new session ID; the original keeps going untouched.
-- `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. Use `type(Scope): imperative summary`, e.g. `fix(Admin): require admin on delete_user`.
-- No `--worktree`: the fork shares this folder, so the scope fence in the prompt is what keeps the two from colliding. If the fix should become its own branch/PR instead, add `--worktree side-quest-<slug>` and tell it to commit and push there.
+- `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. All three parts are yours to fill: `<type>` is `fix`, `feat` or `chore`; `<Scope>` is one PascalCase word for the area; the summary is imperative and lowercase — e.g. `fix(Admin): require admin on delete_user`.
+- Don't pass `--worktree`: it worktrees the folder the session started in, which may be a parent like `~/workspace` rather than the repo. The worktree step in the prompt targets the right repo.
+- If the finding only exists on your current branch (not on the default branch), base the worktree on `HEAD` instead and say so in the prompt.
 - It prints `backgrounded · <id> · <name>`; tell the user `claude attach <id>` (or `←` in agent view) to look in.
-- **After forking, fence yourself too:** the fork's edits land in your working tree uncommitted. Stage only explicit paths from your own task (never `git add -A` / `git commit -a`) and leave the fork's files alone.
 
 If `$CLAUDE_CODE_SESSION_ID` is unset, or the command refuses ("Workspace not trusted", `claude` not on PATH), fall back to **Note it for later** and tell the user why.
 
@@ -63,5 +66,5 @@ If `$CLAUDE_CODE_SESSION_ID` is unset, or the command refuses ("Workspace not tr
 | Silently ignoring it to stay focused | Ask. A one-line question costs the user seconds. |
 | Offering a fork for something the task needs | It's part of the task — fix it. |
 | Offering forks for nits | Mention or drop them; save forks for things worth a PR. |
-| A fork prompt without a scope fence | Both sessions share the folder — name the files it may touch and forbid branch/stash/commit moves. |
+| A fork prompt without the worktree step | The fork would edit your working tree — always have it create a worktree of the finding's repo first. |
 | Waiting on the fork or checking on it | It reports on its own; carry on with the main task. |

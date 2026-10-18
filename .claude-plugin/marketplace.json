@@ -34,7 +34,7 @@
       "name": "avegancafe",
       "source": "./plugins/avegancafe",
       "version": "1.3.0",
-      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive); side-quest + Stop hook (offers to fork the session into a named background session that fixes an out-of-scope finding in the same folder). Mods: session-title (auto-names sessions `feat|fix|chore(Scope): imperative summary`, refined after each turn).",
+      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive); side-quest + Stop hook (offers to fork the session into a named background session that fixes an out-of-scope finding in its own worktree of the affected repo). Mods: session-title (auto-names sessions `feat|fix|chore(Scope): imperative summary`, refined after each turn).",
       "category": "productivity"
     }
   ]
