@@ -1,11 +1,11 @@
 ---
 name: side-quest
-description: Use when, partway through a task, you notice a worthwhile problem the current task does not need fixed — an unrelated bug, a security or data-loss risk, a stale or broken test, a misleading doc, dead code, a refactor that would pay off — and you feel the pull to either detour into it or let it slide.
+description: Use before finishing or summarizing any task during which you noticed a worthwhile problem outside its scope — a missing auth or permission check, a swallowed exception, a skipped or stale test, a README step that no longer works, an unrelated bug — instead of only mentioning it in your reply.
 ---
 
 # Side quest
 
-Stay on the main task, and still get tangential findings fixed: offer to hand each one to a **separate background Claude session** (`claude --bg`) that works it in its own worktree, while this session keeps going.
+Stay on the main task, and still get tangential findings fixed: offer to **fork** this session into a named background session (`claude --bg --resume … --fork-session`) that fixes it in its own git worktree of the affected repo while this session keeps going.
 
 ## Is it a side quest?
 
@@ -37,19 +37,29 @@ Otherwise handle it in place:
 
 ## Spawning
 
-The new session starts cold — it sees **none** of this conversation. Write its prompt to a fresh temp file (`PROMPT_FILE=$(mktemp)`) containing: the finding with `path:line` evidence, why it matters, what "done" looks like, a scope fence ("fix only this; don't touch <the main task's area>"), and how to finish (commit on its branch, push, open a draft PR if the repo uses them, end with a report).
+Fork **this** session into a named background session. The fork inherits the whole conversation, so it already knows the finding, the evidence, and what you're doing — no handoff doc. It does its work in a **git worktree of the repo the finding lives in**, so it never touches your working tree.
 
-Run from the repo root:
+1. Find that repo's root: `git -C <dir of the finding's file> rev-parse --show-toplevel`. It may differ from your working directory — e.g. you started in `~/workspace` and the finding is in `~/workspace/<repo>`.
+2. Run from your current working directory, filling in every `<…>`:
 
 ```bash
-claude --bg -n "fix(Scope): imperative summary" -w side-quest-<slug> "$(cat "$PROMPT_FILE")"
+claude --bg --resume "$CLAUDE_CODE_SESSION_ID" --fork-session \
+  --name "<type>(<Scope>): <imperative summary>" \
+  "You are a fork of this session. Your only job: <the finding, path:line>. Done = <what done looks like>.
+First create a git worktree of the repo at <repo root> (not of your current directory): git -C <repo root> worktree add <repo root>/.claude/worktrees/side-quest-<slug> -b side-quest/<slug> <default branch, e.g. origin/main>. Do all reading, editing, testing and git work inside that worktree.
+Touch only what this fix needs. Commit on side-quest/<slug>, push, and open a draft PR if the repo uses them. Don't start side quests of your own — list any further findings in your report, which ends with the branch, PR link, and files changed."
 ```
 
-- `-n` names the session in agents view — use `type(Scope): imperative summary`.
-- `-w` gives it its own git worktree and branch, so it can't collide with this session's edits. Drop `-w` outside a git repo.
+- `--resume … --fork-session` copies this conversation into a new session ID; the original keeps going untouched.
+- `--name` (`-n`) is **required** — it's the fork's title in agent view, `claude agents`, and `claude attach <name>`. Fill in all three parts:
+  - `<type>` is exactly one of `fix`, `chore` or `feat` — never `refactor`, `docs`, `test` or anything else (a refactor or doc fix is `chore`).
+  - `<Scope>` is the domain the fix works in: the least common denominator that covers everything it touches (`Auth`, `Billing`, `Onboarding`), as one PascalCase word — never a file, function or path.
+  - `<imperative summary>` is lowercase, imperative, no trailing period — e.g. `fix(Auth): require admin to delete users`.
+- Don't pass `--worktree`: it worktrees the folder the session started in, which may be a parent like `~/workspace` rather than the repo. The worktree step in the prompt targets the right repo.
+- If the finding only exists on your current branch (not on the default branch), base the worktree on `HEAD` instead and say so in the prompt.
 - It prints `backgrounded · <id> · <name>`; tell the user `claude attach <id>` (or `←` in agent view) to look in.
 
-If it refuses with "Workspace not trusted", or `claude` isn't on PATH, fall back to **Note it for later** and tell the user why.
+If `$CLAUDE_CODE_SESSION_ID` is unset, or the command refuses ("Workspace not trusted", `claude` not on PATH), fall back to **Note it for later** and tell the user why.
 
 ## Common mistakes
 
@@ -59,5 +69,5 @@ If it refuses with "Workspace not trusted", or `claude` isn't on PATH, fall back
 | Silently ignoring it to stay focused | Ask. A one-line question costs the user seconds. |
 | Offering a fork for something the task needs | It's part of the task — fix it. |
 | Offering forks for nits | Mention or drop them; save forks for things worth a PR. |
-| A spawn prompt that says "fix the thing we saw" | The fork has no context — paste the evidence. |
+| A fork prompt without the worktree step | The fork would edit your working tree — always have it create a worktree of the finding's repo first. |
 | Waiting on the fork or checking on it | It reports on its own; carry on with the main task. |
