@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.2] - 2026-10-18
+
+### Fixed
+- `avegancafe` 1.3.1 — the `side-quest` Stop hook now asks for a one-line "nothing else to flag" reply when there's no side quest, instead of "end your turn silently". Claude Code rejects an empty turn, so the silent instruction always led to a forced extra reply after a false positive.
+
 ## [2.3.1] - 2026-10-18
 
 ### Changed
