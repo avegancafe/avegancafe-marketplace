@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.1.0] - 2026-10-19
+
+### Fixed
+- `avegancafe` 2.1.0 — `session-title` now titles the session once, from your first message only, and never again. Before, a background Haiku pass re-titled the session after every turn, and the mismatch between the refined title and the shown one tripped the "renamed by hand" check, so a false "auto-title paused" toast popped up mid-conversation. It also ran on wakeups, task notifications and other injected prompts; those are now skipped. `/session-title lock` / `unlock` are gone (nothing changes the title after the first prompt); `/session-title` still shows it.
+
 ## [3.0.0] - 2026-10-19
 
 ### Changed
