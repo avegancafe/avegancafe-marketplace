@@ -25,8 +25,10 @@ Guidance for Claude Code when working **on this repository**.
      `scripts/sync-plugin-version.sh <name> <version>` locally.
    The marketplace must never advertise a version the plugin doesn't have; if an
    entry looks stale, check that plugin's last `release.yml` run first.
-3. **Use SSH `git@github.com:...` URLs.** All repos are private; SSH is the
-   configured auth. Don't rewrite sources to HTTPS.
+3. **Use SSH `git@github.com:...` URLs**, the configured auth, for private plugin
+   repos; don't rewrite them to HTTPS. The exception is a **public plugin meant for
+   sharing** (`session-management`): it uses an HTTPS source so people without a
+   GitHub SSH key can install it.
 
 ---
 
@@ -59,15 +61,16 @@ under `plugins/` and referenced with relative-path sources.
 .github/workflows/sync-plugin-versions.yml  # Auto-sync entry versions (see rule 2)
 scripts/sync-plugin-version.sh    # The sync itself: entry version + metadata bump + CHANGELOG
 plugins/                          # Plugins vendored in this repo
-  avegancafe/                     # Kyle's personal plugin for one-off skills (e.g. work-notes-vault)
+  avegancafe/                     # Kyle's personal plugin for one-off skills (work-notes-vault)
 README.md
 ```
 
 ## How it references plugins
 
 External plugins use a `url` source pointing at the plugin's **own private
-repo** over SSH — those are NOT vendored here (`avegancafe/kitchen-brigade`
-and `avegancafe/beadwork`).
+repo** — those are NOT vendored here (`avegancafe/kitchen-brigade`,
+`avegancafe/beadwork` and `avegancafe/session-management`). Private ones use SSH;
+`session-management` is public and uses HTTPS (see rule 3).
 
 ```json
 {

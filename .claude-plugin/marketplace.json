@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.2.1"
+    "version": "3.3.0"
   },
   "plugins": [
     {
@@ -31,10 +31,20 @@
       "category": "productivity"
     },
     {
+      "name": "session-management",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/session-management.git"
+      },
+      "version": "1.0.0",
+      "description": "Keeps session titles in `feat|fix|chore(Scope): imperative summary` form: Haiku titles each session once from your first prompt, `/autoname` re-titles it from the session history on demand, `/session-title` shows the title. Public; installs over HTTPS.",
+      "category": "productivity"
+    },
+    {
       "name": "avegancafe",
       "source": "./plugins/avegancafe",
       "version": "2.2.0",
-      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). Mods: session-title (auto-names sessions `feat|fix|chore(Scope): imperative summary`, titled once from your first prompt; `/autoname` re-titles from the session history on demand).",
+      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). The session-title mod moved to session-management in 3.0.0.",
       "category": "productivity"
     }
   ]
