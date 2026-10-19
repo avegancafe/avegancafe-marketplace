@@ -23,4 +23,4 @@ if [ -f "$tp" ]; then
   ' "$tp" 2>/dev/null)
   [ "$invoked" = "true" ] && exit 0
 fi
-jq -n '{decision:"block", reason:"side-quest check: does your reply leave unfixed a real problem you found outside this task (a bug, risk, stale test or wrong doc) that is not already tracked, that the user did not ask you to only list, and that you did not already fix? If yes, invoke the side-quest skill now and follow it. If no, end your turn silently: output nothing more."}'
+jq -n '{decision:"block", reason:"side-quest check: does your reply leave unfixed a real problem you found outside this task (a bug, risk, stale test or wrong doc) that is not already tracked, that the user did not ask you to only list, and that you did not already fix? If yes, invoke the side-quest skill now and follow it. If no, reply with one short line saying there is nothing else to flag."}'
