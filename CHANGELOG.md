@@ -4,6 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.3.0] - 2026-10-19
+
+### Added
+- `session-management` 1.0.0 — the `session-title` mod (auto session titles, `/session-title`, `/autoname`) as its own public plugin, [`avegancafe/session-management`](https://github.com/avegancafe/session-management). Its entry uses an HTTPS source so it installs without a GitHub SSH key.
+
+### Changed
+- `avegancafe` 3.0.0 — **breaking:** the `session-title` mod is removed; install `session-management` to keep it. The plugin now ships only `work-notes-vault`.
+- README: the access note no longer claims every repo is private.
+
 ## [3.2.1] - 2026-10-19
 
 ### Changed
