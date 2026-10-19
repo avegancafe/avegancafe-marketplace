@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2026-10-19
+
+### Changed
+- `avegancafe` 2.0.0 — **breaking:** the `side-quest` skill and its `Stop` hook moved to the `j2-sandbox` plugin in `j2-claude-plugins`, where the team can opt in and the feature can graduate to `j2-eng`. Update `avegancafe` to drop the old copy; install/enable `j2-sandbox@j2-claude-plugins` to keep the feature. `work-notes-vault` and `session-title` are unchanged.
+
+### Removed
+- `avegancafe`: `side-quest` skill and `hooks/side-quest-stop.sh`.
+
 ## [2.3.2] - 2026-10-18
 
 ### Fixed
