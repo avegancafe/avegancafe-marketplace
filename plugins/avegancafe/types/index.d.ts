@@ -1,8 +1,8 @@
 /**
- * `title` is the last title this mod produced; `locked` stops it touching the
- * title (set when someone renamed the session by hand, or via the command).
+ * `title` is the title this mod produced, if any; `done` is set once the
+ * session's first prompt has been handled, so the mod never runs again.
  */
-export type TitleState = { title?: string; locked: boolean }
+export type TitleState = { title?: string; done: boolean }
 
 declare module 'claude-code' {
   interface PluginState {
