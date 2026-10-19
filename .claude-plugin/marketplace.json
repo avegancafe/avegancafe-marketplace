@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.1.2"
+    "version": "3.2.0"
   },
   "plugins": [
     {
@@ -34,7 +34,7 @@
       "name": "avegancafe",
       "source": "./plugins/avegancafe",
       "version": "2.1.0",
-      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). Mods: session-title (auto-names sessions `feat|fix|chore(Scope): imperative summary`, titled once from your first prompt).",
+      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). Mods: session-title (auto-names sessions `feat|fix|chore(Scope): imperative summary`, titled once from your first prompt; `/autoname` re-titles from the session history on demand).",
       "category": "productivity"
     }
   ]

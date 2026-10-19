@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.2.0] - 2026-10-19
+
+### Added
+- `avegancafe` 2.2.0 — `/autoname` re-titles the session on demand. It reads the conversation so far (your messages and Claude's replies; tool calls and injected notices left out, long sessions cut to the first prompt plus the latest turns) and asks Haiku for a title under the same `feat|fix|chore(Scope): summary` rules as the automatic first-prompt title, then applies it with `/rename`. Text after the command is an optional hint weighed on top of the history. The automatic title also no longer fires on a first message that is a slash command.
+
 ## [3.1.2] - 2026-10-19
 
 ### Changed

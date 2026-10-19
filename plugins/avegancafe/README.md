@@ -20,4 +20,4 @@ warrant a plugin of their own.
 
 | Mod | Purpose |
 |-----|---------|
-| `session-title` | Names the session in `feat\|fix\|chore(Scope): imperative summary` form (e.g. `feat(ClaudePlugins): auto-name sessions by convention`). Haiku titles it once, from the first message you send, and never touches it again. Wakeups, task notifications and other injected messages don't count, and a session that already has a name (resumed, renamed, or started with `--name`) is left alone. `/session-title` shows the title it chose. |
+| `session-title` | Names the session in `feat\|fix\|chore(Scope): imperative summary` form (e.g. `feat(ClaudePlugins): auto-name sessions by convention`). Haiku titles it once, from the first message you send, and never touches it again. Wakeups, task notifications and other injected messages don't count, and a session that already has a name (resumed, renamed, or started with `--name`) is left alone. `/session-title` shows the title it chose. Run `/autoname` any time to re-title the session from its whole history under the same rules (an optional hint after it, e.g. `/autoname mostly the bootstrap fix`, is weighed on top of the history). |
