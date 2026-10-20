@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.3.2"
+    "version": "3.3.3"
   },
   "plugins": [
     {
@@ -36,7 +36,7 @@
         "source": "url",
         "url": "https://github.com/avegancafe/session-management.git"
       },
-      "version": "1.1.0",
+      "version": "1.2.0",
       "description": "Keeps session titles in `feat|fix|chore(Scope): imperative summary` form: Haiku titles each session once from your first prompt, `/autoname` re-titles it from the session history on demand, `/session-title` shows the title. Public; installs over HTTPS.",
       "category": "productivity"
     },
