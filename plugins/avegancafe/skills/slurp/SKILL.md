@@ -1,6 +1,6 @@
 ---
 name: slurp
-description: Use when Kyle runs /slurp or asks to transcribe his voice recorder, pull recordings off the IC RECORDER, or archive recorder audio as notes. Transcribes every recording on the USB recorder locally, writes titled + summarized transcripts into his notes--work vault, commits and pushes them, then clears the device.
+description: Use when Kyle runs /slurp or asks to transcribe his voice recorder, pull recordings off the IC RECORDER, or archive recorder audio as notes. Transcribes every recording on the USB recorder locally, writes titled + summarized transcripts into his notes--work vault, commits and pushes them, and leaves the audio on the device (already-transcribed recordings are skipped on later runs).
 ---
 
 # /slurp — IC RECORDER → notes--work
@@ -8,7 +8,7 @@ description: Use when Kyle runs /slurp or asks to transcribe his voice recorder,
 Kyle's USB voice recorder mounts at `/Volumes/IC RECORDER` and stores recordings as
 `REC_FILE/FOLDER*/YYMMDD_HHMM.mp3` (local time, e.g. `261021_2240` = 2026-10-21 22:40).
 `scripts/transcribe.py` does **transcription only** (local `mlx-whisper`, nothing leaves the
-machine). You do everything after: titles, summaries, vault files, git, device cleanup.
+machine). You do everything after: titles, summaries, vault files, git.
 
 Vault: `~/workspace/notes--work` (`github.com/avegancafe/notes--work`, private). Read its
 `.claude/CLAUDE.md` once before writing. Recorder transcripts go in `transcripts/recorder/`;
@@ -16,29 +16,36 @@ Vault: `~/workspace/notes--work` (`github.com/avegancafe/notes--work`, private).
 
 ## 1. Transcribe
 
+Pull the vault first: the script skips any recording that already has a note there.
+
 ```bash
+git -C ~/workspace/notes--work pull --rebase
 uv run "${CLAUDE_PLUGIN_ROOT}/skills/slurp/scripts/transcribe.py"
 ```
 
 Run it in the background for anything long (large-v3-turbo runs well faster than real time on
 Kyle's M3 Pro; first run also downloads the model, ~1.6 GB). Exit 2 = recorder not mounted: tell
-Kyle to plug it in and stop. Stdout is a JSON manifest `[{recorder_id, status, staging_dir}]`;
-`status` is `new`, `cached` (already transcribed in `/tmp/slurp/`, not redone) or `error`.
+Kyle to plug it in and stop. Stdout is a JSON manifest `[{recorder_id, status, staging_dir?, note?}]`.
+`status` is one of:
+
+- `new`: transcribed just now.
+- `cached`: transcribed earlier into `/tmp/slurp/` but not in the vault yet (a run that stopped
+  before committing). Not redone; write its note like a `new` one.
+- `transcribed`: already has a note in the vault (`note` is its path). Skipped: no note, no commit.
+- `error`: report it.
+
 Each `staging_dir` holds `audio.mp3` and `transcript.json`:
 `{recorder_id, sha256, recorded_at_local, recorded_at_utc, duration_s, model, language, segments[{start,end,text}]}`.
+`/tmp/slurp/` is wiped on reboot — that's intended.
 
-`/tmp/slurp/` is wiped on reboot — that's intended. Once the device is cleared, **the committed
-transcript is the only copy of a recording.**
+To see what's on the device without transcribing anything (Kyle asks "what's on the recorder",
+"what hasn't been slurped yet"), run it with `--status`: each recording comes back `transcribed`
+(with its note) or `pending`.
 
-## 2. Skip what's already in the vault
+## 2. Nothing to write for `transcribed`
 
-```bash
-V=~/workspace/notes--work; git -C "$V" pull --rebase
-rg -l "^recorder_id: <id>$" "$V/transcripts/recorder"
-```
-
-A hit means it was committed on an earlier run (and the device delete probably failed) — don't
-write it again; it's still eligible for step 5.
+The script already matched those to their notes by `recorder_id`, so skip straight past them.
+If every recording is `transcribed`, say so and stop after the report (step 6).
 
 ## 3. Write one note per new recording
 
@@ -105,19 +112,22 @@ On push rejection: `git pull --rebase` and push again (repeat a couple of times;
 and the Granola Action also push to `main`). Never force-push, stash, or reset. If a rebase
 conflicts outside `transcripts/recorder/`, stop and report.
 
-## 5. Clear the device — only after a successful push
+## 5. Leave the audio on the device
 
-For each recording that is now in `origin/main`
-(`git -C ~/workspace/notes--work log origin/main --oneline -- <note path>` returns a commit):
-re-check that the device file's sha256 still equals `transcript.json`'s `sha256`, list the
-files you are about to delete in your message, then `rm` them from `/Volumes/IC RECORDER/REC_FILE/…`.
-Leave anything that errored, wasn't committed, or whose checksum changed. Don't delete anything
-outside `REC_FILE/`. Don't eject or unmount the recorder; Kyle unplugs it himself.
+Don't delete, move, rename, eject or unmount anything on the recorder. Recordings stay there, and later
+runs skip them as `transcribed`. The recorder holds about 14 GiB, and its MP3s run about 86 MB per
+recorded hour, so it fills after roughly 170 hours. In the report, say how much space is free
+(`df -h "/Volumes/IC RECORDER"`), and flag it once less than 10% is free.
+
+If Kyle asks to clear the device: only recordings reported `transcribed` whose note is in
+`origin/main` (`git -C ~/workspace/notes--work log origin/main --oneline -- <note path>` returns a
+commit) are eligible. Give him the exact `rm` command for those files, quoting the path because it
+contains a space, and let him run it.
 
 ## 6. Report
 
-Number transcribed, then each title → GitHub link with its duration, plus the files deleted from the device
-and anything skipped/errored and why. Link each note at the commit that added it, so the link
+Number transcribed, then each new title → GitHub link with its duration, plus how many recordings
+were skipped as already `transcribed`, the recorder's free space, and anything errored and why. Link each note at the commit that added it, so the link
 works from any machine and session:
 `https://github.com/avegancafe/notes--work/blob/<commit-sha>/<note path>`. Repo-relative
 paths don't open when the session's working directory isn't the vault.

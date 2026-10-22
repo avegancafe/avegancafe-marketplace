@@ -9,13 +9,19 @@ No git, no vault writes, no deletion -- the /slurp skill does all of that. Each
 recording `REC_FILE/**/YYMMDD_HHMM.mp3` is copied to `/tmp/slurp/<id>/audio.mp3`,
 checksummed against the device copy, and transcribed to `transcript.json`. A
 recording whose staged `transcript.json` already matches the device file's
-sha256 is reported `cached` and not re-transcribed.
+sha256 is reported `cached` and not re-transcribed. A recording that already has a note in
+the vault (a `recorder_id:` frontmatter match) is reported `transcribed` and skipped, so
+recordings can stay on the device across runs without being redone.
 
     transcribe.py                       # default device /Volumes/IC RECORDER
+    transcribe.py --status              # list what's on the device and whether it's in the vault; no transcription
     transcribe.py --device /Volumes/X   # another mount point
+    transcribe.py --vault <dir>         # another vault recorder dir
     transcribe.py --only 261021_2240    # just these recorder ids
 
-stdout: JSON manifest  [{"recorder_id", "status": new|cached|error, "staging_dir", "error"?}]
+stdout: JSON manifest  [{"recorder_id", "status": new|cached|transcribed|pending|error,
+                         "staging_dir"?, "note"?, "error"?}]
+        (`pending` = not in the vault yet; only --status reports it)
 stderr: progress.
 """
 
@@ -33,6 +39,7 @@ from pathlib import Path
 DEFAULT_DEVICE = Path("/Volumes/IC RECORDER")
 STAGING = Path("/tmp/slurp")
 MODEL = "mlx-community/whisper-large-v3-turbo"
+DEFAULT_VAULT = Path.home() / "workspace/notes--work/transcripts/recorder"
 
 
 def log(msg: str) -> None:
@@ -53,6 +60,20 @@ def recorded_at(recorder_id: str) -> datetime | None:
         return datetime.strptime(recorder_id[:11], "%y%m%d_%H%M").astimezone()
     except ValueError:
         return None
+
+
+def vault_notes(vault: Path) -> dict[str, Path]:
+    """recorder_id -> note path, from each note's `recorder_id:` frontmatter line."""
+    notes = {}
+    for md in vault.rglob("*.md") if vault.is_dir() else []:
+        with md.open(encoding="utf-8", errors="replace") as f:
+            for line in f:
+                if line.startswith("recorder_id:"):
+                    notes[line.split(":", 1)[1].strip()] = md
+                    break
+                if line.startswith("## "):  # past the frontmatter
+                    break
+    return notes
 
 
 def duration_s(path: Path) -> float | None:
@@ -116,7 +137,9 @@ def transcribe_one(src: Path) -> dict:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--device", type=Path, default=DEFAULT_DEVICE, help=f"recorder mount (default: {DEFAULT_DEVICE})")
+    ap.add_argument("--vault", type=Path, default=DEFAULT_VAULT, help=f"vault recorder dir (default: {DEFAULT_VAULT})")
     ap.add_argument("--only", nargs="+", metavar="ID", help="only these recorder ids (e.g. 261021_2240)")
+    ap.add_argument("--status", action="store_true", help="list recordings and their vault status; transcribe nothing")
     args = ap.parse_args()
 
     rec_dir = args.device / "REC_FILE"
@@ -128,9 +151,18 @@ def main() -> int:
     if args.only:
         files = [p for p in files if p.stem in set(args.only)]
     log(f"{len(files)} recording(s) on {args.device}")
+    if not args.vault.is_dir():
+        log(f"warning: vault dir {args.vault} not found; treating every recording as not yet transcribed")
+    notes = vault_notes(args.vault)
 
     manifest = []
     for src in files:
+        note = notes.get(src.stem)
+        if note or args.status:
+            log(f"{src.stem}: {'transcribed -> ' + str(note) if note else 'pending'}")
+            manifest.append({"recorder_id": src.stem, "status": "transcribed" if note else "pending",
+                             **({"note": str(note)} if note else {})})
+            continue
         try:
             manifest.append(transcribe_one(src))
         except Exception as e:  # keep going: one bad file shouldn't block the rest
