@@ -110,7 +110,11 @@ def transcribe_one(src: Path) -> dict:
     import mlx_whisper  # deferred: slow import, and not needed for cached runs
 
     log(f"{rid}: transcribing ({MODEL})...")
-    result = mlx_whisper.transcribe(str(audio), path_or_hf_repo=MODEL)
+    # condition_on_previous_text=False: feeding each window's output back in as context is what
+    # sends whisper into "Yeah." x40 loops on noisy pocket audio. A/B on a 49-min recording
+    # (2026-10-22): loop segments 159 -> 16, no content lost. hallucination_silence_threshold
+    # removed the rest but also dropped real speech and ran ~3.5x slower, so it's off.
+    result = mlx_whisper.transcribe(str(audio), path_or_hf_repo=MODEL, condition_on_previous_text=False)
     when = recorded_at(rid)
     payload = {
         "recorder_id": rid,
