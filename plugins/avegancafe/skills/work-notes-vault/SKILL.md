@@ -24,14 +24,14 @@ If the pull fails (local edits, divergence), mine the local copy and say it may 
 
 ## Vault layout
 
-`J2/People/` (one note per person + `People.base`), `J2/Meetings/` (hand-written, `YYYY-MM-DD Title.md`), `J2/Projects/<slug>/`, `J2/Inbox/`, daily notes `YYYY-MM-DD.md` at the root, and `granola/` (the archive). **The vault's own `.claude/CLAUDE.md` is the authority on conventions** — read it before creating or editing any vault note.
+`J2/People/` (one note per person + `People.base`), `J2/Meetings/` (hand-written, `YYYY-MM-DD Title.md`), `J2/Projects/<slug>/`, `J2/Inbox/`, daily notes `YYYY-MM-DD.md` at the root, and `transcripts/` (generated archives: `granola/` from Granola, `recorder/` from Kyle's voice recorder; the Granola sync code is in `scripts/granola/`). **The vault's own `.claude/CLAUDE.md` is the authority on conventions** — read it before creating or editing any vault note.
 
 ## The Granola archive
 
 ```
-granola/notes/YYYY/MM/YYYY-MM-DD--<title-slug>--<note_id>.md     readable
-granola/notes/YYYY/MM/YYYY-MM-DD--<title-slug>--<note_id>.json   raw Granola API response
-granola/state.json   { "last_synced_at": ... } — when the last sync ran
+transcripts/granola/YYYY/MM/YYYY-MM-DD--<title-slug>--<note_id>.md     readable
+transcripts/granola/YYYY/MM/YYYY-MM-DD--<title-slug>--<note_id>.json   raw Granola API response
+transcripts/granola/state.json   { "last_synced_at": ... } — when the last sync ran
 ```
 
 - Date in path = note `created_at` in **UTC** (an evening ET meeting can land on the next day). Transcript times are UTC too.
@@ -50,34 +50,46 @@ granola/state.json   { "last_synced_at": ... } — when the last sync ran
 
 **Kyle's own typed notes (`private_notes_*`) are only in the `.json`** — the `.md` doesn't render them. Check them when he asks what *he* wrote down.
 
+## Recorder transcripts
+
+```
+transcripts/recorder/YYYY/MM/YYYY-MM-DD--<title-slug>--<recorder_id>.md
+```
+
+Recordings from Kyle's USB voice recorder, added by `/slurp`. Frontmatter: `title` (Claude-written), `recorded_at` (local time with offset), `duration`, `source: ic-recorder`, `recorder_id` (device filename, e.g. `261021_2240`), `model`. Body: `## Summary` (Claude-written), `## Transcript` with lines `[HH:MM:SS (+HH:MM:SS)] text`: UTC wall clock, then offset from the recording start.
+
+- **Path dates are local** (from the device clock), unlike Granola's UTC dates.
+- **No speakers.** A single mic, so no `me`/`them` labels. Any attribution in a summary is inferred.
+- No `.json` sidecar; the `.md` is the whole record (the audio is not kept).
+
 ## Mining recipes
 
 Run from the vault root. Search summaries first (cheap, high signal), then open transcripts for exact wording.
 
 ```bash
 # Index: date, title, url, file — scope months with the path glob
-jq -r '[.created_at[:10], .title, .web_url, input_filename] | @tsv' granola/notes/2026/0[3-5]/*.json | sort
+jq -r '[.created_at[:10], .title, .web_url, input_filename] | @tsv' transcripts/granola/2026/0[3-5]/*.json | sort
 
 # Which meetings mention a topic (summary or transcript)
-rg -il 'credentialing' granola/notes -g '*.md'
+rg -il 'credentialing' transcripts/granola -g '*.md'
 
 # Summaries only
-jq -r 'select((.summary_markdown // "") | test("credentialing"; "i")) | "\(.created_at[:10])  \(.title)  \(input_filename)"' granola/notes/*/*/*.json
+jq -r 'select((.summary_markdown // "") | test("credentialing"; "i")) | "\(.created_at[:10])  \(.title)  \(input_filename)"' transcripts/granola/*/*/*.json
 
 # Meetings with a given attendee (name or email)
-jq -r 'select(any(.attendees[]?; ((.email // "") + " " + (.name // "")) | test("alex"; "i"))) | "\(.created_at[:10])  \(.title)"' granola/notes/*/*/*.json
+jq -r 'select(any(.attendees[]?; ((.email // "") + " " + (.name // "")) | test("alex"; "i"))) | "\(.created_at[:10])  \(.title)"' transcripts/granola/*/*/*.json
 
 # By Granola folder (list names first: jq -r '.folder_membership[]?.name' … | sort | uniq -c)
-jq -r --arg f "<folder name>" 'select(any(.folder_membership[]?; .name == $f)) | input_filename' granola/notes/*/*/*.json
+jq -r --arg f "<folder name>" 'select(any(.folder_membership[]?; .name == $f)) | input_filename' transcripts/granola/*/*/*.json
 
 # What Kyle himself said about something
-rg -i '^\[[0-9:]+\] me: .*pricing' granola/notes -g '*.md'
+rg -i '^\[[0-9:]+\] me: .*pricing' transcripts/granola -g '*.md'
 
 # Kyle's typed notes
-jq -r 'select((.private_notes_markdown // "") != "") | "\(.created_at[:10]) \(.title)\n\(.private_notes_markdown)\n"' granola/notes/*/*/*.json
+jq -r 'select((.private_notes_markdown // "") != "") | "\(.created_at[:10]) \(.title)\n\(.private_notes_markdown)\n"' transcripts/granola/*/*/*.json
 
 # Summary section of one note
-awk '/^## Summary/{p=1} /^## Transcript/{p=0} p' "granola/notes/2026/04/<file>.md"
+awk '/^## Summary/{p=1} /^## Transcript/{p=0} p' "transcripts/granola/2026/04/<file>.md"
 ```
 
 For broad sweeps (many months, many hits), fan out by month or quarter to subagents and have each return findings with citations.
@@ -93,6 +105,6 @@ For broad sweeps (many months, many hits), fan out by month or quarter to subage
 
 ## Rules
 
-- **Never edit anything under `granola/`** — the sync regenerates it and will overwrite or prune your changes.
-- `granola/` is an intentional raw archive, so the vault's "don't paste full transcripts" rule doesn't apply *to it*. When writing new vault notes (e.g. `J2/Meetings/`), link to the archived file and `web_url`; quote only the lines you need.
+- **Never edit anything under `transcripts/granola/`** — the sync regenerates it and will overwrite or prune your changes. `transcripts/recorder/` is written only by the `/slurp` skill.
+- `transcripts/` is an intentional raw archive, so the vault's "don't paste full transcripts" rule doesn't apply *to it*. When writing new vault notes (e.g. `J2/Meetings/`), link to the archived file and `web_url`; quote only the lines you need.
 - The archive holds attendee emails and private discussions — keep excerpts out of public places (public repos, public channels, shared artifacts) unless Kyle says otherwise.
