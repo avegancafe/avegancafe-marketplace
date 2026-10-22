@@ -65,6 +65,8 @@ model: mlx-community/whisper-large-v3-turbo
 
 ## Transcript
 
+_Times are UTC._
+
 [02:43:05 (+00:03:05)] <segment text>
 
 [02:43:08 (+00:03:08)] <next segment text>
@@ -77,6 +79,14 @@ model: mlx-community/whisper-large-v3-turbo
   Never edit the transcript text itself.
 - **No speaker labels.** The recorder has one mic. If the summary attributes something to a
   person, say it's inferred from content ("Zara (inferred)").
+- **Link people.** Before writing the summary, list `J2/People/`. Write a name as a
+  `[[wikilink]]` to its note when one matches (Carl → `[[Karl]]`, Abby → `[[Abby Pfeiffer]]`).
+  Leave names with no note as transcribed, still marked *(inferred)*. Never guess who an
+  unnamed speaker is.
+- **Whisper repetition loops.** Noisy audio (a recorder in a pocket, a restaurant) makes
+  whisper repeat a phrase dozens of times ("Yeah." ×40). Leave them in the transcript. Open
+  the summary with a one-line `> **Recording notes.**` callout that gives the loop stretches
+  as approximate offsets, and treat numbers and names near them as transcription-uncertain.
 - **Title/summary from the transcript only.** A recording that's empty or near-silent still gets a
   note (title like "Empty recording") so it isn't lost silently; tell Kyle about it.
 - The recorder's clock has no timezone, so `recorded_at` assumes this Mac's current timezone.
@@ -106,5 +116,8 @@ outside `REC_FILE/`. Then `diskutil eject "/Volumes/IC RECORDER"` so Kyle can un
 
 ## 6. Report
 
-Number transcribed, then each title → vault path with its duration, plus the files deleted from the device
-and anything skipped/errored and why.
+Number transcribed, then each title → GitHub link with its duration, plus the files deleted from the device
+and anything skipped/errored and why. Link each note at the commit that added it, so the link
+works from any machine and session:
+`https://github.com/avegancafe/notes--work/blob/<commit-sha>/<note path>`. Repo-relative
+paths don't open when the session's working directory isn't the vault.
