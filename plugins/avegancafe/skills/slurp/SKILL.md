@@ -66,9 +66,12 @@ model: mlx-community/whisper-large-v3-turbo
 ## Transcript
 
 [02:43:05 (+00:03:05)] <segment text>
+
+[02:43:08 (+00:03:08)] <next segment text>
 ```
 
-- **Transcript lines:** one per segment. The first time is the UTC wall clock
+- **Transcript lines:** one per segment, with a **blank line between segments**. GitHub's
+  markdown preview joins single-newline lines into one paragraph. The first time is the UTC wall clock
   (`recorded_at_utc` + `start`, `HH:MM:SS`); the time in parentheses is the offset from the start of the recording.
   Write these lines with a short script (e.g. `jq` or Python over `segments`), not by hand.
   Never edit the transcript text itself.
