@@ -1,6 +1,6 @@
 {
   "name": "avegancafe",
-  "version": "3.1.2",
+  "version": "3.1.3",
   "description": "Kyle's personal Claude plugin: a home for one-offs that don't warrant their own plugin. Ships the work-notes-vault skill (his private Obsidian work vault and its Granola + voice-recorder transcript archives) and /slurp (transcribe the USB voice recorder into that vault).",
   "author": {
     "name": "Kyle Holzinger",

@@ -112,7 +112,7 @@ For each recording that is now in `origin/main`
 re-check that the device file's sha256 still equals `transcript.json`'s `sha256`, list the
 files you are about to delete in your message, then `rm` them from `/Volumes/IC RECORDER/REC_FILE/…`.
 Leave anything that errored, wasn't committed, or whose checksum changed. Don't delete anything
-outside `REC_FILE/`. Then `diskutil eject "/Volumes/IC RECORDER"` so Kyle can unplug it.
+outside `REC_FILE/`. Don't eject or unmount the recorder; Kyle unplugs it himself.
 
 ## 6. Report
 
