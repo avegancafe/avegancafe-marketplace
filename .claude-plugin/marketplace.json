@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.3.10"
+    "version": "3.3.11"
   },
   "plugins": [
     {
@@ -43,7 +43,7 @@
     {
       "name": "avegancafe",
       "source": "./plugins/avegancafe",
-      "version": "3.2.1",
+      "version": "3.3.0",
       "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). The session-title mod moved to session-management in 3.0.0.",
       "category": "productivity"
     }
