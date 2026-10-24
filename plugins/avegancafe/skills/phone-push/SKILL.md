@@ -83,9 +83,9 @@ To attach one explicitly, add `mcp_connections` at the top level of the create b
 ]
 ```
 
-Only claude.ai connectors exist in the cloud. Local MCP servers (Zola, anything from this
-machine's config) are unavailable to routines; do that part locally first and bake the result
-into the prompt.
+Only claude.ai connectors exist in the cloud (HEY, Gmail, Zola, and others; see
+https://claude.ai/customize/connectors). MCP servers configured only on this machine are
+unavailable to routines; do that part locally first and bake the result into the prompt.
 
 ## Prompt templates
 
