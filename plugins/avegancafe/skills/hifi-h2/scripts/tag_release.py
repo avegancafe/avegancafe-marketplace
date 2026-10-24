@@ -70,7 +70,9 @@ for f, (_, _, t) in zip(files, tracks):
     if n != int(t["position"]):
         sys.exit(f"{f}: number {n} doesn't line up with track {t['position']}")
     length = FLAC(os.path.join(d, f)).info.length
-    if t.get("length") and abs(length - t["length"] / 1000) > 3:
+    if not t.get("length"):
+        sys.exit(f"{f}: MusicBrainz has no length for track {t['position']}, can't verify the match")
+    if abs(length - t["length"] / 1000) > 3:
         sys.exit(f"{f}: {length:.0f}s vs MusicBrainz {t['length']/1000:.0f}s — wrong release?")
 
 cover = os.path.join(d, "cover.jpg")
@@ -104,7 +106,8 @@ for f, (disc, total, t) in zip(files, tracks):
         "MUSICBRAINZ_ALBUMID": rel_id, "MUSICBRAINZ_RELEASEGROUPID": rg["id"],
         "MUSICBRAINZ_TRACKID": rec["id"],
     }
-    if re.search(r"_PA(\b|_|\.)", f):
+    # The _PA marker is gone after the first run's rename, so keep an advisory already written.
+    if re.search(r"_PA(\b|_|\.)", f) or FLAC(os.path.join(d, f)).get("ITUNESADVISORY"):
         tags["ITUNESADVISORY"] = "1"
     tags = {k: v for k, v in tags.items() if v}
     safe_title = re.sub(r'[\\/:*?"<>|]', "_", t["title"])  # FAT32-illegal characters
@@ -115,10 +118,10 @@ for f, (disc, total, t) in zip(files, tracks):
     p = os.path.join(d, f)
     fl = FLAC(p)
     fl.delete()
-    fl.clear_pictures()
     for k, v in tags.items():
         fl[k] = v
-    if pic:
+    if pic:  # without a replacement, keep whatever art is already embedded
+        fl.clear_pictures()
         fl.add_picture(pic)
     fl.save()
     if rename and new != f:

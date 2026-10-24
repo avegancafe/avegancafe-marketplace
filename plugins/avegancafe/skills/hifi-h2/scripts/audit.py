@@ -25,7 +25,7 @@ root = sys.argv[1]
 as_json = "--json" in sys.argv
 report = {}
 
-for dp, dn, fn in sorted(os.walk(root)):
+for dp, dn, fn in os.walk(root):  # not sorted(): that exhausts the walk before dn is pruned
     dn[:] = sorted(d for d in dn if not d.startswith(".") and d != "System Volume Information")
     files = [f for f in sorted(fn) if f.lower().endswith(AUDIO) and not f.startswith("._")]
     if not files:
@@ -53,12 +53,15 @@ for dp, dn, fn in sorted(os.walk(root)):
         has_art = False
         if f.lower().endswith(".mp3"):
             try:
-                id3 = ID3(p)
+                id3 = ID3(p, load_v1=False)  # with v1 fallback a v1-only file loads fine
                 has_art = any(k.startswith("APIC") for k in id3.keys())
             except ID3NoHeaderError:
                 flags["id3v1-only"] += 1
-        elif f.lower().endswith(".flac"):
-            has_art = bool(mutagen.File(p).pictures)
+        else:
+            raw = mutagen.File(p)
+            rt = raw.tags or {}
+            has_art = bool(getattr(raw, "pictures", None)) or any(
+                k in rt for k in ("covr", "metadata_block_picture", "METADATA_BLOCK_PICTURE", "coverart"))
         if not (folder_art or has_art):
             flags["no-art"] += 1
     rel = os.path.relpath(dp, root)
