@@ -23,8 +23,11 @@ Load the tool first: `ToolSearch` with `select:RemoteTrigger`.
    routines, write the rule that turns the check's result into that line.
 3. **Create the routine** with `RemoteTrigger` `action: "create"` and the body below.
    Done when the response's summary line shows the parsed run time you intended.
-4. **"Now" requests:** call `RemoteTrigger` `action: "run"` with the new routine's `trigger_id`.
-   Do this for anything urgent too: a scheduled `run_once_at` fire can land a minute or more late.
+4. **"Now" requests:** create needs a schedule, so give it `run_once_at` about 10 minutes out, call
+   `RemoteTrigger` `action: "run"` with the new `trigger_id`, then immediately `update` it with
+   `{"enabled": false}` so the scheduled fire doesn't push a second time.
+   **Scheduled requests:** a `run_once_at` fire can land a minute or more late, so for a
+   time-critical reminder set it a few minutes before the target time.
 5. **Report back** the routine name, its claude.ai link, and the fire time in both
    America/New_York and UTC, so Kyle can catch a wrong conversion.
 
@@ -63,14 +66,15 @@ Load the tool first: `ToolSearch` with `select:RemoteTrigger`.
 - **`message.role` is required**; the create fails without it. Generate the uuid fresh each time
   (`uuidgen | tr A-Z a-z`).
 - **Environment:** `env_01HiT3B442ebKLVNAXpe2eCi` ("Default", anthropic_cloud) is the one that
-  worked. `RemoteTrigger list` shows the environments other routines use.
+  worked. Two environments are named "Default", so match on the id. `RemoteTrigger list` shows the environments other routines use.
 - **`allowed_tools`:** add the connector tools a check-then-notify prompt needs next to
   `PushNotification`.
 
 ## Connectors
 
 Routines created through the API auto-attach the account's claude.ai connectors (HEY, Gmail, …).
-To attach one explicitly, add `mcp_connections` to `session_context`:
+To attach one explicitly, add `mcp_connections` at the top level of the create body (beside
+`name` and `job_config`, not inside it):
 
 ```json
 "mcp_connections": [
