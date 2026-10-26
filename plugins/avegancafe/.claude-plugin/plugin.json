@@ -1,7 +1,7 @@
 {
   "name": "avegancafe",
-  "version": "3.4.1",
-  "description": "Kyle's personal Claude plugin: a home for one-offs that don't warrant their own plugin. Ships the work-notes-vault skill (his private Obsidian work vault and its Granola + voice-recorder transcript archives), /slurp (transcribe the USB voice recorder into that vault), hifi-h2 (tag music from MusicBrainz and load it onto his Rockbox HIFI H2 player), and phone-push (send a push notification to his phone now or at a scheduled time via a cloud routine).",
+  "version": "3.5.0",
+  "description": "Kyle's personal Claude plugin: a home for one-offs that don't warrant their own plugin. Ships the work-notes-vault skill (his private Obsidian work vault and its Granola + voice-recorder transcript archives), /slurp (transcribe the USB voice recorder into that vault, labelling speakers from voiceprints Kyle confirms), hifi-h2 (tag music from MusicBrainz and load it onto his Rockbox HIFI H2 player), and phone-push (send a push notification to his phone now or at a scheduled time via a cloud routine).",
   "author": {
     "name": "Kyle Holzinger",
     "url": "https://github.com/avegancafe"

@@ -56,7 +56,7 @@ transcripts/granola/state.json   { "last_synced_at": ... } — when the last syn
 transcripts/recorder/YYYY/MM/YYYY-MM-DD--<title-slug>--<recorder_id>.md
 ```
 
-Recordings from Kyle's USB voice recorder, added by `/slurp`. Frontmatter: `title` (Claude-written), `recorded_at` (local time with offset), `duration`, `source: ic-recorder`, `recorder_id` (device filename, e.g. `261021_2240`), `model`. Body: `## Summary` (Claude-written), `## Transcript` with lines `[HH:MM:SS (+HH:MM:SS)] text`: UTC wall clock, then offset from the recording start.
+Recordings from Kyle's USB voice recorder, added by `/slurp`. Frontmatter: `title` (Claude-written), `recorded_at` (local time with offset), `duration`, `source: ic-recorder`, `recorder_id` (device filename, e.g. `261021_2240`), `model`, and on diarized notes `speakers` (names or `Speaker N`) and `diarization`. Body: `## Summary` (Claude-written), `## Transcript` with lines `[HH:MM:SS (+HH:MM:SS)] **Speaker:** text`: UTC wall clock, then offset from the recording start, then who spoke (from voice matching; older or undiarized notes have no `**Speaker:**`).
 
 - **Path dates are local** (from the device clock), unlike Granola's UTC dates.
 - **No speakers.** A single mic, so no `me`/`them` labels. Any attribution in a summary is inferred.
