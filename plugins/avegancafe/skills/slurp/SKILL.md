@@ -49,7 +49,25 @@ If every recording is `transcribed`, say so and stop after the report (step 6).
 
 ## 3. Write one note per new recording
 
-Read `transcript.json`, then write
+**First, match each recording to Kyle's calendar.** Most recordings are a meeting on Kyle's
+Google Calendar, and the event tells you who the transcript can't. Load the Google Calendar
+connector's `list_events` (ToolSearch `calendar list_events`) and list the primary calendar
+from ~30 min before `recorded_at_local` to its end (`+ duration_s`). Match each recording to the
+event whose window it falls in. Kyle usually starts the recorder a few minutes after the event
+starts, and meetings often run over (on 2026-10-27, a 15:32 recording matched "Kyle <> Rachel",
+15:30–16:00, and ran to 16:22). Skip events Kyle declined, room resources, and the bot address.
+
+- **A clear match with one other attendee** (a 1:1) names the other party. Use their name in the
+  summary instead of "the counterpart", linked to their `J2/People/` note, and say in the
+  `Recording notes` callout which event it matched.
+- **A group event** lists who *might* be speaking, not who is. Use it to resolve first names in
+  the transcript ("Abby" in a meeting with abby@ → `[[Abby Pfeiffer]]`), but still mark
+  attributions *(inferred)*.
+- **No match, or back-to-back events it could be either of** (a corridor chat, a lunch): leave the
+  other party unnamed and say so in the callout. Never pick between two candidate events on a hunch.
+- If Kyle names the other party afterward, update the note. Kyle's word beats the calendar.
+
+Then read `transcript.json` and write
 `transcripts/recorder/YYYY/MM/YYYY-MM-DD--<title-slug>--<recorder_id>.md`, where the date and
 `YYYY/MM` come from **`recorded_at_local`** (unlike Granola, whose paths use UTC dates).
 `<title-slug>`: lowercase, ASCII, hyphens, ≤ 60 chars.
@@ -62,6 +80,8 @@ duration: 00:31:12                           # from duration_s
 source: ic-recorder
 recorder_id: 261021_2240
 model: mlx-community/whisper-large-v3-turbo
+calendar_event: "Kyle <> Rachel"             # matched event title; omit when no match
+attendees: ["[[Rachel Foley]]"]              # other attendees, linked; omit when no match
 ---
 
 # <title>
@@ -89,7 +109,8 @@ _Times are UTC._
 - **Link people.** Before writing the summary, list `J2/People/`. Write a name as a
   `[[wikilink]]` to its note when one matches (Carl → `[[Karl]]`, Abby → `[[Abby Pfeiffer]]`).
   Leave names with no note as transcribed, still marked *(inferred)*. Never guess who an
-  unnamed speaker is.
+  unnamed speaker is. A calendar match (above) isn't a guess, but the transcript's
+  content alone is.
 - **Whisper repetition loops.** Noisy audio (a recorder in a pocket, a restaurant) makes
   whisper repeat a phrase dozens of times ("Yeah." ×40). Leave them in the transcript. Open
   the summary with a one-line `> **Recording notes.**` callout that gives the loop stretches
