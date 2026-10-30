@@ -50,6 +50,12 @@ def log(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
+def write_atomic(path: Path, t: dict) -> None:
+    tmp = path.with_suffix(".json.tmp")
+    tmp.write_text(json.dumps(t, indent=2, ensure_ascii=False) + "\n")
+    tmp.replace(path)
+
+
 def load_audio(path: Path) -> np.ndarray:
     raw = subprocess.run(
         ["ffmpeg", "-v", "error", "-i", str(path), "-ac", "1", "-ar", str(SR), "-f", "f32le", "-"],
@@ -116,6 +122,11 @@ def main() -> int:
     anchor_idx = np.where((dur >= ANCHOR_S) & emb.any(axis=1))[0]
     if len(anchor_idx) < 2 * (args.speakers or 1):
         log(f"{t['recorder_id']}: only {len(anchor_idx)} segments >= {ANCHOR_S}s; too little speech to diarize")
+        for s in segs:  # drop labels from an earlier run so the render falls back to unlabeled
+            s.pop("speaker", None)
+            s.pop("speaker_sim", None)
+        t.pop("diarization", None)
+        write_atomic(tj, t)
         return 1
     labels = cluster(emb[anchor_idx], args.speakers)
 
@@ -141,9 +152,7 @@ def main() -> int:
 
     t["diarization"] = {"model": MODEL, "speakers": len(keep), "requested": args.speakers,
                         "anchor_s": ANCHOR_S, "anchors": len(anchor_idx)}
-    tmp = tj.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(t, indent=2, ensure_ascii=False) + "\n")
-    tmp.replace(tj)
+    write_atomic(tj, t)
 
     summary = {}
     for s in segs:

@@ -100,11 +100,13 @@ def main() -> int:
 
     date = t["recorded_at_local"][:10]  # local date, unlike Granola's UTC paths
     out = args.vault / date[:4] / date[5:7] / f"{date}--{meta['slug']}--{t['recorder_id']}.md"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    tmp = out.with_suffix(".md.tmp")
+    tmp.write_text(note, encoding="utf-8")
+    tmp.replace(out)  # atomic: a failed write never truncates the existing note
     for old in out.parent.glob(f"*--{t['recorder_id']}.md"):  # a re-render may change the slug
         if old != out:
             old.unlink()
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(note, encoding="utf-8")
     print(out)
     return 0
 
