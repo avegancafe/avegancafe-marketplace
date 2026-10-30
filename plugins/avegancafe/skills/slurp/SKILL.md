@@ -7,8 +7,10 @@ description: Use when Kyle runs /slurp or asks to transcribe his voice recorder,
 
 Kyle's USB voice recorder mounts at `/Volumes/IC RECORDER` and stores recordings as
 `REC_FILE/FOLDER*/YYMMDD_HHMM.mp3` (local time, e.g. `261021_2240` = 2026-10-21 22:40).
-`scripts/transcribe.py` does **transcription only** (local `mlx-whisper`, nothing leaves the
-machine). You do everything after: titles, summaries, vault files, git.
+Three scripts work on one staged `transcript.json`, and everything runs locally:
+`scripts/transcribe.py` transcribes it (`mlx-whisper`), `scripts/diarize.py` labels each
+segment with an anonymous speaker (`S1`, `S2`, …), and `scripts/render.py` serializes it into
+the vault note. You do the judgment in between: calendar match, title, summary, and git.
 
 Vault: `~/workspace/notes--work` (`github.com/avegancafe/notes--work`, private). Read its
 `.claude/CLAUDE.md` once before writing. Recorder transcripts go in `transcripts/recorder/`;
@@ -37,6 +39,28 @@ Kyle to plug it in and stop. Stdout is a JSON manifest `[{recorder_id, status, s
 Each `staging_dir` holds `audio.mp3` and `transcript.json`:
 `{recorder_id, sha256, recorded_at_local, recorded_at_utc, duration_s, model, language, segments[{start,end,text}]}`.
 `/tmp/slurp/` is wiped on reboot — that's intended.
+
+### Diarize
+
+After the calendar match (step 3) tells you how many people were there, label speakers in
+place for each `new`/`cached` recording:
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/slurp/scripts/diarize.py" <staging_dir> --speakers 2   # a 1:1
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/slurp/scripts/diarize.py" <staging_dir>                # unknown count
+```
+
+It embeds each segment's audio with a local speaker model (ECAPA; ~20 MB, first run downloads
+it), clusters only the long, clean segments (≥ 3 s) into speakers, then gives every segment its
+nearest speaker. It adds `speaker` and `speaker_sim` to each segment. About 30 s per
+25-minute recording, so background it for several recordings.
+
+- **Anonymous, and stored nowhere.** Voices are compared only within one recording. No
+  voiceprint is saved, named, or reused across recordings, so `S1` in one note has nothing to do
+  with `S1` in another. Keep it that way: a stored voiceprint of a coworker is biometric PII.
+- **Pass `--speakers` only when you know the count.** A 1:1 calendar match means 2. A group
+  event's attendee list is an upper bound, not a count, so leave the flag off there.
+- Exit 1 = too little long speech to diarize (a near-empty recording). Render it without labels.
 
 To see what's on the device without transcribing anything (Kyle asks "what's on the recorder",
 "what hasn't been slurped yet"), run it with `--status`: each recording comes back `transcribed`
@@ -67,54 +91,58 @@ starts, and meetings often run over (on 2026-10-27, a 15:32 recording matched "K
   other party unnamed and say so in the callout. Never pick between two candidate events on a hunch.
 - If Kyle names the other party afterward, update the note. Kyle's word beats the calendar.
 
-Then read `transcript.json` and write
-`transcripts/recorder/YYYY/MM/YYYY-MM-DD--<title-slug>--<recorder_id>.md`, where the date and
-`YYYY/MM` come from **`recorded_at_local`** (unlike Granola, whose paths use UTC dates).
-`<title-slug>`: lowercase, ASCII, hyphens, ≤ 60 chars.
+Then diarize (step 1), read `transcript.json`, and write `<staging_dir>/meta.json`:
 
-```markdown
----
-title: <short descriptive title you write>
-recorded_at: 2026-10-21T22:40:00-04:00      # recorded_at_local
-duration: 00:31:12                           # from duration_s
-source: ic-recorder
-recorder_id: 261021_2240
-model: mlx-community/whisper-large-v3-turbo
-calendar_event: "Kyle <> Rachel"             # matched event title; omit when no match
-attendees: ["[[Rachel Foley]]"]              # other attendees, linked; omit when no match
----
-
-# <title>
-
-## Summary
-
-<Granola-style: ### headings per topic, bullets, decisions and action items called out>
-
-## Transcript
-
-_Times are UTC._
-
-[02:43:05 (+00:03:05)] <segment text>
-
-[02:43:08 (+00:03:08)] <next segment text>
+```json
+{
+  "title": "<short descriptive title you write>",
+  "slug": "<lowercase, ASCII, hyphens, ≤ 60 chars>",
+  "calendar_event": "Kyle <> Rachel",
+  "attendees": ["Rachel Foley"],
+  "speakers": {"S1": "Kyle (inferred)", "S2": "[[Rachel Foley]] (inferred)"},
+  "recording_notes": "Matched calendar event \"Kyle <> Rachel\" (15:30–16:00 ET) ...",
+  "summary_md": "### <topic>\n- ...\n\n### Action items\n- ..."
+}
 ```
 
-- **Transcript lines:** one per segment, with a **blank line between segments**. GitHub's
-  markdown preview joins single-newline lines into one paragraph. The first time is the UTC wall clock
-  (`recorded_at_utc` + `start`, `HH:MM:SS`); the time in parentheses is the offset from the start of the recording.
-  Write these lines with a short script (e.g. `jq` or Python over `segments`), not by hand.
-  Never edit the transcript text itself.
-- **No speaker labels.** The recorder has one mic. If the summary attributes something to a
-  person, say it's inferred from content ("Zara (inferred)").
+Leave out `calendar_event` and `attendees` when there's no match, and `speakers` when you can't
+tell who is who. Then render the note:
+
+```bash
+uv run "${CLAUDE_PLUGIN_ROOT}/skills/slurp/scripts/render.py" <staging_dir>
+```
+
+It writes `transcripts/recorder/YYYY/MM/YYYY-MM-DD--<slug>--<recorder_id>.md` and prints the
+path. The date comes from **`recorded_at_local`** (unlike Granola, whose paths use UTC dates).
+It builds the frontmatter, the `> **Recording notes.**` callout, your summary, a speaker legend,
+and one transcript line per segment:
+
+```markdown
+[19:06:05 (+00:02:05)] **S2:** I did the NPM switchover.
+
+[19:06:09 (+00:02:09)] **S1?:** Sick.
+```
+
+That's the UTC wall clock, the offset into the recording, and the speaker. A trailing `?` marks
+a low-confidence label: a short interjection, or a segment too short to embed. Re-running
+`render.py` (say, after Kyle names someone) rewrites the note in place, including a changed slug.
+
+- **Never hand-write or edit transcript lines.** Change `meta.json` and re-render instead.
+- **Map speakers to people from content, once.** `S1`/`S2` come from the audio; which one is
+  Kyle comes from what they say ("as head of eng…", the counterpart describing their own
+  work). Put that in `speakers` with *(inferred)*, and use it for attributions in the
+  summary. In a 1:1, Kyle is one of the two clusters. If the content doesn't settle it, leave
+  `speakers` out rather than guess.
+- **Labels are evidence, not truth.** Clustering is reliable at turn boundaries on full sentences
+  and weak on one-word replies. Don't hang an attribution on a single `?` line.
 - **Link people.** Before writing the summary, list `J2/People/`. Write a name as a
   `[[wikilink]]` to its note when one matches (Carl → `[[Karl]]`, Abby → `[[Abby Pfeiffer]]`).
   Leave names with no note as transcribed, still marked *(inferred)*. Never guess who an
   unnamed speaker is. A calendar match (above) isn't a guess, but the transcript's
   content alone is.
 - **Whisper repetition loops.** Noisy audio (a recorder in a pocket, a restaurant) makes
-  whisper repeat a phrase dozens of times ("Yeah." ×40). Leave them in the transcript. Open
-  the summary with a one-line `> **Recording notes.**` callout that gives the loop stretches
-  as approximate offsets, and treat numbers and names near them as transcription-uncertain.
+  whisper repeat a phrase dozens of times ("Yeah." ×40). Leave them in the transcript. Give the loop
+  stretches as approximate offsets in `recording_notes` (rendered as the callout that opens the summary), and treat numbers and names near them as transcription-uncertain.
 - **Title/summary from the transcript only.** A recording that's empty or near-silent still gets a
   note (title like "Empty recording") so it isn't lost silently; tell Kyle about it.
 - The recorder's clock has no timezone, so `recorded_at` assumes this Mac's current timezone.
