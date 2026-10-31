@@ -1,6 +1,6 @@
 ---
 name: channels-for-complex-work
-description: Use in Claude Duet before starting multi-part work, and whenever deciding where work should run (answer in the chat, start one thread, or make a channel), especially in the main chat or a channel's coordinator when a request has several parts that need coordinating (a migration, a rework across repos, a multi-step project). Also use when Kyle asks about or adds to an operation that already has its own channel, when running a channel's Tasks list as its coordinator, or when a thread finds its task has grown into several coordinated parts. Kyle's rule: complex multi-task operations get their own channel, coordinated through that channel's Tasks list, so the main chat stays clean.
+description: Use in Claude Duet before starting work that might be too big for one thread, meaning several parts that need coordinating (a migration, a rework across repos, a multi-step project), to decide between one thread and a new channel; especially in the main chat or a channel's coordinator. Also use when Kyle asks about or adds to an operation that already has its own channel, when running a channel's Tasks list as its coordinator, or when a thread finds its task has grown into several coordinated parts. Kyle's rule: complex multi-task operations get their own channel, coordinated through that channel's Tasks list, so the main chat stays clean.
 ---
 
 # Channels for complex work
