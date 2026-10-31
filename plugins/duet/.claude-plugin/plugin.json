@@ -1,0 +1,9 @@
+{
+  "name": "duet",
+  "version": "0.1.0",
+  "description": "How Claude Duet works, written for the Claude agents running inside it: where plugins come from and when they load, how channels, threads and sessions relate, and how a channel's repos are attached. Install it to your claude.ai chat plugins so every new Duet thread and channel starts out knowing. Grows one skill at a time as new Duet behavior is learned.",
+  "author": {
+    "name": "Kyle Holzinger",
+    "url": "https://github.com/avegancafe"
+  }
+}
