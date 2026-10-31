@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.7.0] - 2026-10-31
+
+### Changed
+- `duet` 0.2.0: `duet-basics` now covers channel instructions: lasting channel behavior is set there, the coordinator proposes changes with `propose_channel_instructions` and they apply only when the user taps Update, and a channel always uses a plugin agent only when its instructions say so.
+
 ## [3.6.1] - 2026-10-31
 
 ### Changed
