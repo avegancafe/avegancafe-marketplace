@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.8.0] - 2026-10-31
+
+### Added
+- `linear-todos` 0.1.0 (external, `avegancafe/linear-todos`): a Claude Duet skill that manages Kyle's Linear TODO team through the Linear connector (add with the CLI's date rules and `!priority` marker, list, done, snooze, morning digest, evening review). Install it to claude.ai chat plugins.
+
 ## [3.7.0] - 2026-10-31
 
 ### Changed

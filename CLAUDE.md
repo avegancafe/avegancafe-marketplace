@@ -71,7 +71,7 @@ README.md
 
 External plugins use a `url` source pointing at the plugin's **own public
 repo** — those are NOT vendored here (`avegancafe/kitchen-brigade`,
-`avegancafe/beadwork` and `avegancafe/session-management`). They use HTTPS
+`avegancafe/beadwork`, `avegancafe/session-management` and `avegancafe/linear-todos`). They use HTTPS
 sources (see rule 3).
 
 ```json
