@@ -28,8 +28,8 @@ jobs:
           echo "marketplace.json $manifest · CHANGELOG $changelog"
           test "$manifest" = "$changelog"
 
-      - name: Validate vendored plugins
-        run: for p in plugins/*/; do echo "== $p"; claude plugin validate "$p"; done
+      - name: Index only (no plugin content, no local sources)
+        run: scripts/check-index-only.sh
 
       - name: Shellcheck scripts
-        run: find scripts plugins -name '*.sh' -print0 | xargs -0 -r shellcheck
+        run: find scripts -name '*.sh' -print0 | xargs -0 -r shellcheck

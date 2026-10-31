@@ -1,26 +1,22 @@
 name: Sync plugin versions
 
-# Keeps marketplace.json's plugin versions in step with the plugins themselves:
-# - external plugins (own repos) send a `plugin-released` repository_dispatch
-#   from their main branch with { name, version }
-# - vendored plugins (plugins/*) are synced when their plugin.json changes on main
-# Each sync bumps metadata.version (patch) and adds a CHANGELOG entry, then
-# commits straight to main. See scripts/sync-plugin-version.sh.
+# Keeps marketplace.json's plugin versions in step with the plugins themselves.
+# Every plugin lives in its own repo, whose release.yml sends a `plugin-released`
+# repository_dispatch from its main branch with { name, version }. Each sync
+# bumps metadata.version (patch) and adds a CHANGELOG entry, then commits
+# straight to main. See scripts/sync-plugin-version.sh.
 
 on:
   repository_dispatch:
     types: [plugin-released]
-  push:
-    branches: [main]
-    paths: ['plugins/*/.claude-plugin/plugin.json']
   workflow_dispatch:
     inputs:
       name:
-        description: Plugin name (blank = sync every vendored plugin)
-        required: false
+        description: Plugin name (as listed in marketplace.json)
+        required: true
       version:
-        description: Version to set (required with a name)
-        required: false
+        description: Version to set (the plugin repo's plugin.json version)
+        required: true
 
 permissions:
   contents: write
@@ -39,19 +35,12 @@ jobs:
         with:
           ref: main
 
-      - name: Apply version(s)
+      - name: Apply version
         env:
           # Read via env, never interpolated into the script (dispatch payloads are input).
           PAYLOAD_NAME: ${{ github.event.client_payload.name || inputs.name }}
           PAYLOAD_VERSION: ${{ github.event.client_payload.version || inputs.version }}
-        run: |
-          if [ -n "$PAYLOAD_NAME" ]; then
-            scripts/sync-plugin-version.sh "$PAYLOAD_NAME" "$PAYLOAD_VERSION"
-          else
-            for manifest in plugins/*/.claude-plugin/plugin.json; do
-              scripts/sync-plugin-version.sh "$(jq -r .name "$manifest")" "$(jq -r .version "$manifest")"
-            done
-          fi
+        run: scripts/sync-plugin-version.sh "$PAYLOAD_NAME" "$PAYLOAD_VERSION"
 
       - uses: actions/setup-node@v4
         with:
