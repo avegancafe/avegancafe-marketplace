@@ -1,6 +1,6 @@
 ---
 name: channels-for-complex-work
-description: Use in Claude Duet when deciding where a piece of work should run — answer it in the chat, start one thread, or make a channel — especially in the main chat or any channel's coordinator session when a request has several parts that need coordinating (a migration, a rework across repos, a multi-step project). Covers Kyle's rule that complex multi-task operations get their own channel, coordinated through that channel's Tasks list, so the main chat stays clean.
+description: Use in Claude Duet before starting multi-part work, and whenever deciding where work should run (answer in the chat, start one thread, or make a channel), especially in the main chat or a channel's coordinator when a request has several parts that need coordinating (a migration, a rework across repos, a multi-step project). Also use when Kyle asks about or adds to an operation that already has its own channel, when running a channel's Tasks list as its coordinator, or when a thread finds its task has grown into several coordinated parts. Kyle's rule: complex multi-task operations get their own channel, coordinated through that channel's Tasks list, so the main chat stays clean.
 ---
 
 # Channels for complex work
@@ -19,13 +19,16 @@ Bias toward the channel. Kyle has noticed coordinators lean toward doing work
 in the main chat; when in doubt between one big thread and a channel, pick the
 channel.
 
+If the operation already has a channel, don't do its work where you are: pass
+Kyle's asks to that channel (see "Steering from the main chat").
+
 ## Picking where work goes
 
 | The ask | Where it goes |
 |---------|---------------|
 | A question you can answer, or a quick lookup the coordinator's own tools can reach | Answer it in the chat. |
 | Anything that reads or changes a GitHub repo, however small | A task/thread: the coordinator can't read the channel's repos (see `duet-basics`). |
-| One piece of work with one result, even a long one (a single PR, a draft, a research question) | One task/thread in the current chat. |
+| Clearly one piece of work with one result, even a long one (a single PR, a draft, a research question) | One task/thread in the current chat. If you can't tell whether it's one piece or several, treat it as several. |
 | An operation with **several parts** that each need their own session, run in parallel or in sequence, or that depend on each other (a rework across repos, a migration, a multi-step project, anything Kyle calls "a beast") | **A new channel**, with one task per part. |
 | An ongoing area Kyle will keep coming back to (a project, a repo, a life area) | A channel, even if today's ask is small. |
 
@@ -35,9 +38,9 @@ each other or on Kyle at different points; the work will span more than a day;
 or one thread would end up juggling several PRs or deliverables.
 
 A thread that finds mid-way that its task is really several coordinated parts
-should say so in its report and suggest a channel, rather than growing into one.
-A thread doesn't create channels or tasks itself (the main chat does), so name
-the channel and the tasks it would hold.
+should stop growing it and say so in its report, naming the channel and the
+tasks it would hold. Threads don't create channels or tasks; the main chat
+does, from that report.
 
 If a channel for the area already exists (check the channel list first), use it
 and add tasks there instead of making a new one.
@@ -45,15 +48,16 @@ and add tasks there instead of making a new one.
 ## Setting it up from the coordinator
 
 1. **Make the channel.** Use the coordinator's channel-creation tool (in the
-   main chat this has been `create_project` with the `channel` template; a
-   thread can only ask for one via `ask_chat` with `make_channel`). Name it for
-   the operation in Kyle's words, and give it a topic that says what it's for.
+   main chat: `create_project` with the `channel` template). Name it for the
+   operation in Kyle's words, and give it a topic that says what it's for.
 2. **Brief the channel's Claude in the handover.** The channel's coordinator
    starts cold and only knows what the handover says. Include:
    - Kyle's ask, in his words, and what "done" looks like.
    - The parts, as a proposed task list: one task per part, each with its
      result, and which ones depend on which.
    - Anything already decided or found (repos, constraints, links Kyle gave).
+   - To load the `channels-for-complex-work` skill (duet plugin), so it runs
+     the channel by this skill.
    - This rule: make each part a task on the channel's Tasks list and start
      its session there; keep the channel's top level for questions, decisions
      and short updates; never do the parts' work in the coordinator itself.
@@ -82,8 +86,7 @@ and add tasks there instead of making a new one.
 Once the channel exists, the main chat doesn't do its work.
 
 - When Kyle asks the main chat about the operation, or adds to it, pass it to
-  the channel's coordinator (`message_project` from the main chat; a thread
-  asks with `ask_chat` and `message_channel`) and tell Kyle in a line that
+  the channel's coordinator (`message_project` from the main chat) and tell Kyle in a line that
   you've passed it on.
 - Read the channel's timeline or Tasks list to answer "how's it going"
   questions; don't restart or duplicate its tasks from the main chat.
