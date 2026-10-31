@@ -18,3 +18,4 @@ claude.ai chat plugins. It takes effect in threads started after that.
 | Skill | Purpose |
 |-------|---------|
 | `duet-basics` | Where Duet's plugins come from and when they load, how threads and sessions relate, how a channel's repos are attached, how channel instructions set lasting behavior (like always using a plugin agent), and how to add new learnings to this plugin. |
+| `channels-for-complex-work` | Kyle's rule for where work goes in Duet: complex operations with several coordinated tasks get their own channel, with each part a task on that channel's Tasks list, so the main chat stays clean. Covers when a direct answer or one thread is enough, the handover brief, and steering the channel from the main chat. |
