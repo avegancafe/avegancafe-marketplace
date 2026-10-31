@@ -17,7 +17,7 @@ CHANGELOG on `main` by itself (see rule 2 in [`CLAUDE.md`](CLAUDE.md)).
 ## Adding or updating a plugin
 
 - Add/edit an entry in `plugins[]`. The `name` must match the plugin's `plugin.json` `name`.
-- Use an SSH `url` source: `git@github.com:avegancafe/<repo>.git` (all repos are private).
+- Use an HTTPS `url` source: `https://github.com/avegancafe/<repo>.git` (the plugin repos are public; use SSH only for a private one).
 - Set `version` to match the plugin repo's current `plugin.json` version (once, when
   adding it; the sync keeps it current after that).
 - **External plugin:** copy `release.yml` from `avegancafe/beadwork`

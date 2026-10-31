@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.3] - 2026-10-31
+
+### Changed
+- The marketplace and `beadwork` are now public. `kitchen-brigade` and `beadwork` entries install over HTTPS like `session-management`, so no GitHub SSH key is needed; README, CLAUDE.md and CONTRIBUTING.md say so.
+
 ## [3.5.2] - 2026-10-31
 
 ### Changed

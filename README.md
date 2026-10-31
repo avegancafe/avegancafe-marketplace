@@ -32,4 +32,4 @@ My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin
 
 Then restart Claude Code.
 
-> **Note:** `kitchen-brigade` and `session-management` are public; the marketplace and `beadwork` are private for now. `session-management` installs over HTTPS, so anyone can add it. The other external plugins clone over your GitHub SSH access (`git@github.com:avegancafe/...`), so they need an SSH key on GitHub (and, for `beadwork`, repo access). The `avegancafe` and `juliet` plugins live in this repo under [`plugins/`](plugins/) and installs straight from the marketplace clone.
+> **Note:** the marketplace and every plugin repo (`kitchen-brigade`, `beadwork`, `session-management`) are public, and the external plugins install over HTTPS, so anyone can add them. The `avegancafe` and `juliet` plugins live in this repo under [`plugins/`](plugins/) and installs straight from the marketplace clone.

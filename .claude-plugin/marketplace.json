@@ -7,14 +7,14 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.5.2"
+    "version": "3.5.3"
   },
   "plugins": [
     {
       "name": "kitchen-brigade",
       "source": {
         "source": "url",
-        "url": "git@github.com:avegancafe/kitchen-brigade.git"
+        "url": "https://github.com/avegancafe/kitchen-brigade.git"
       },
       "version": "1.2.0",
       "description": "Lean, stack-agnostic multi-agent orchestration modeled on the brigade de cuisine. /chef routes to strategize / implement / workflow / diagnose; the chef runs the cast (sous-chef, cook, expediter). Bundles the yes-chef greenlight and dinner-rush concurrency skills.",
@@ -24,7 +24,7 @@
       "name": "beadwork",
       "source": {
         "source": "url",
-        "url": "git@github.com:avegancafe/beadwork.git"
+        "url": "https://github.com/avegancafe/beadwork.git"
       },
       "version": "2.4.0",
       "description": "Everything for working in beads (bd): a live pane (mod) showing Claude's task list and your open beads, capture/triage logging, tight bead titles, and a hook that surfaces parent-epic status after bd state changes.",
