@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.10.0] - 2026-10-31
+
+### Changed
+- The marketplace is now index-only. `avegancafe`, `juliet` and `duet` moved, with their history, to their own repos (`avegancafe/claude-plugin-avegancafe`, `avegancafe/claude-plugin-juliet`, `avegancafe/claude-plugin-duet`), and their entries point there over HTTPS. Plugin names and versions are unchanged, so existing installs keep working; each plugin's next version bump installs from its new repo.
+- The *Sync plugin versions* workflow only takes `plugin-released` dispatches from plugin repos (and manual runs with a name and version); the vendored `plugin.json` trigger and the blank "sync every vendored plugin" run are gone.
+- CLAUDE.md, CONTRIBUTING.md and the README say new plugins and plugin changes go in each plugin's own repo, and this repo holds only the manifest, docs and CI.
+- The `avegancafe` entry's description lists all five of its skills.
+
+### Added
+- `scripts/check-index-only.sh`, run in CI: fails if a `plugins/` folder or any plugin content (a `plugin.json`, or a `skills/`, `agents/`, `commands/` or `hooks/` folder) appears, or a manifest entry uses a local path source.
+
+### Removed
+- The vendored `plugins/` folder, and CI's per-plugin validation and shellcheck of it.
+
 ## [3.9.2] - 2026-10-31
 
 ### Changed

@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.9.2"
+    "version": "3.10.0"
   },
   "plugins": [
     {
@@ -42,21 +42,30 @@
     },
     {
       "name": "avegancafe",
-      "source": "./plugins/avegancafe",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/claude-plugin-avegancafe.git"
+      },
       "version": "3.7.0",
-      "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). The session-title mod moved to session-management in 3.0.0.",
+      "description": "Kyle's personal Claude plugin for one-offs: work-notes-vault (his private Obsidian work vault and its Granola + voice-recorder archives), /slurp (transcribe the USB voice recorder into that vault), hifi-h2 (tag and load music onto his Rockbox player), phone-push (push notifications to his phone, now or scheduled) and flipper-usb (drive his Flipper Zero over USB).",
       "category": "productivity"
     },
     {
       "name": "juliet",
-      "source": "./plugins/juliet",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/claude-plugin-juliet.git"
+      },
       "version": "1.0.0",
       "description": "Shared Claude Code tooling for Juliet, the scripted macOS + Fedora setup: the noelle agent and the skills it preloads (juliet-config, juliet-extension, juliet-cross-platform, juliet-bootstrap-step, add-app-config, add-fish-alias). Moved out of Juliet's stowed ~/.claude.",
       "category": "productivity"
     },
     {
       "name": "duet",
-      "source": "./plugins/duet",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/claude-plugin-duet.git"
+      },
       "version": "0.3.0",
       "description": "How Claude Duet works, for the agents running inside it: where plugins come from and when they load, threads vs sessions, how a channel's repos are attached (duet-basics), and when to give complex multi-task work its own channel coordinated through its Tasks list (channels-for-complex-work). Install to claude.ai chat plugins; grows as Duet behavior is learned.",
       "category": "productivity"

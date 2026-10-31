@@ -1,9 +1,0 @@
-{
-  "name": "juliet",
-  "version": "1.0.0",
-  "description": "Claude Code tooling for Juliet (avegancafe/Juliet), the scripted macOS + Fedora setup: the noelle agent (\"I'm changing my computer config\") and the skills it preloads — juliet-config, juliet-extension, juliet-cross-platform, juliet-bootstrap-step, add-app-config and add-fish-alias. Shared baseline for anyone running Juliet; personal tooling lives in other plugins.",
-  "author": {
-    "name": "Kyle Holzinger",
-    "url": "https://github.com/avegancafe"
-  }
-}

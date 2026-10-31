@@ -6,28 +6,33 @@ Guidance for Claude Code when working **on this repository**.
 
 ## ⚠️ CRITICAL — read before any change
 
-1. **Bump the version on EVERY change to this repo.** Update `metadata.version` in
+1. **This repo is the marketplace index and nothing else.** It holds the manifest
+   ([`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json)), its docs
+   and its CI. **New plugins, and new functionality for existing plugins (skills,
+   agents, commands, hooks, mods, MCP config), go in each plugin's own repo**,
+   never here. Adding a plugin means making its repo first (new ones are named
+   `avegancafe/claude-plugin-<name>`), then adding an entry here that points at it.
+   No `plugins/` folder, no plugin content, no local path sources:
+   [`scripts/check-index-only.sh`](scripts/check-index-only.sh) fails CI if any
+   of these appear.
+2. **Bump the version on EVERY change to this repo.** Update `metadata.version` in
    [`.claude-plugin/marketplace.json`](.claude-plugin/marketplace.json) (semver) and
    add a matching entry to [`CHANGELOG.md`](CHANGELOG.md). Docs-only changes bump
    the patch version too.
-2. **Don't hand-edit plugin entry versions — they sync automatically.** When a
-   plugin's version changes on its `main`, `.github/workflows/sync-plugin-versions.yml`
-   sets that entry's `version`, bumps `metadata.version` (patch), adds a CHANGELOG
-   entry, and commits to `main` as `github-actions[bot]`:
-   - **External plugins** (own repos) trigger it with a `plugin-released`
-     repository_dispatch sent by their own `release.yml`, authenticated by their
-     `MARKETPLACE_DISPATCH_TOKEN` secret (fine-grained PAT, this repo only,
-     Contents: read & write).
-   - **Vendored plugins** (`plugins/*`) trigger it when their `plugin.json` changes
-     on `main`.
+3. **Don't hand-edit plugin entry versions — they sync automatically.** When a
+   plugin's version changes on its repo's `main`, its own `release.yml` sends a
+   `plugin-released` repository_dispatch (authenticated by that repo's
+   `MARKETPLACE_DISPATCH_TOKEN` secret: fine-grained PAT, this repo only, Contents:
+   read & write). `.github/workflows/sync-plugin-versions.yml` then sets that
+   entry's `version`, bumps `metadata.version` (patch), adds a CHANGELOG entry, and
+   commits to `main` as `github-actions[bot]`.
    - To resync by hand: Actions → *Sync plugin versions* → Run workflow (name +
-     version, or blank to sync every vendored plugin), or run
-     `scripts/sync-plugin-version.sh <name> <version>` locally.
+     version), or run `scripts/sync-plugin-version.sh <name> <version>` locally.
    The marketplace must never advertise a version the plugin doesn't have; if an
    entry looks stale, check that plugin's last `release.yml` run first.
-3. **Public plugin repos use HTTPS sources** (`https://github.com/avegancafe/<repo>.git`)
-   so people without a GitHub SSH key can install them. All current external plugins
-   are public. Only a private plugin repo would use an SSH `git@github.com:...` URL.
+4. **Public plugin repos use HTTPS sources** (`https://github.com/avegancafe/<repo>.git`)
+   so people without a GitHub SSH key can install them. All current plugins are
+   public. Only a private plugin repo would use an SSH `git@github.com:...` URL.
 
 ---
 
@@ -47,64 +52,61 @@ See [`.claude/patterns/README.md`](.claude/patterns/README.md) for the conventio
 
 ## What this repo is
 
-A Claude Code **plugin marketplace**. It's primarily an index pointing at
-external plugin repos, but some plugins are **vendored directly in this repo**
-under `plugins/` and referenced with relative-path sources.
+A Claude Code **plugin marketplace**: an index pointing at plugin repos. It holds
+no plugin code.
 
 ## Layout
 
 ```
 .claude-plugin/marketplace.json   # The index: name, owner, metadata, plugins[]. REQUIRED.
 .claude/patterns/                 # Durable repo patterns (see ToC above)
-.github/workflows/ci.yml          # Validate index + vendored plugins, version sync, shellcheck
-.github/workflows/sync-plugin-versions.yml  # Auto-sync entry versions (see rule 2)
+.github/workflows/ci.yml          # Validate index, index-only check, version vs CHANGELOG, shellcheck
+.github/workflows/sync-plugin-versions.yml  # Auto-sync entry versions (see rule 3)
 scripts/sync-plugin-version.sh    # The sync itself: entry version + metadata bump + CHANGELOG
-plugins/                          # Plugins vendored in this repo
-  avegancafe/                     # Kyle's personal plugin for one-off skills (work-notes-vault)
-  juliet/                         # Shared Juliet baseline: noelle agent + Juliet config skills
-  duet/                           # How Claude Duet works (install to claude.ai chat plugins)
-README.md
+scripts/check-index-only.sh       # Fails on plugin content or local path sources (see rule 1)
+README.md, CONTRIBUTING.md, CHANGELOG.md
 ```
 
-## How it references plugins
+## Plugins and their repos
 
-External plugins use a `url` source pointing at the plugin's **own public
-repo** — those are NOT vendored here (`avegancafe/kitchen-brigade`,
-`avegancafe/beadwork`, `avegancafe/session-management` and `avegancafe/linear-todos`). They use HTTPS
-sources (see rule 3).
+| Plugin | Repo |
+|--------|------|
+| `kitchen-brigade` | `avegancafe/kitchen-brigade` |
+| `beadwork` | `avegancafe/beadwork` |
+| `session-management` | `avegancafe/session-management` |
+| `linear-todos` | `avegancafe/linear-todos` |
+| `avegancafe` | `avegancafe/claude-plugin-avegancafe` |
+| `juliet` | `avegancafe/claude-plugin-juliet` |
+| `duet` | `avegancafe/claude-plugin-duet` |
 
-```json
-{
-  "name": "kitchen-brigade",
-  "source": { "source": "url", "url": "git@github.com:avegancafe/kitchen-brigade.git" },
-  "version": "1.0.1"
-}
-```
+`avegancafe`, `juliet` and `duet` were vendored here under `plugins/` until
+marketplace 3.10.0; each moved to its own repo with its history.
 
 > Note: `beadwork` was the `avegancafe` grab-bag plugin (repo
 > `avegancafe/avegancafe-plugin`) until 2.0.0, when it became a dedicated beads
-> plugin. GitHub redirects the old repo URL, but sources use the new one. The vendored
-> `plugins/avegancafe/` plugin (added in marketplace 2.0.0) is a new, unrelated
+> plugin. GitHub redirects the old repo URL, but sources use the new one. The
+> current `avegancafe` plugin (added in marketplace 2.0.0) is a new, unrelated
 > plugin that reuses the name.
 
-Adding an **external** plugin also means wiring its release notification — see
-"Adding or updating a plugin" in [`CONTRIBUTING.md`](CONTRIBUTING.md); without it the
-entry's version silently stops tracking releases.
-
-Vendored plugins (`avegancafe`) use a relative-path source:
+Every entry uses a `url` source:
 
 ```json
 {
-  "name": "avegancafe",
-  "source": "./plugins/avegancafe",
-  "version": "1.0.0"
+  "name": "duet",
+  "source": { "source": "url", "url": "https://github.com/avegancafe/claude-plugin-duet.git" },
+  "version": "0.3.0"
 }
 ```
 
+Adding a plugin also means wiring its release notification — see "Adding a plugin"
+in [`CONTRIBUTING.md`](CONTRIBUTING.md); without it the entry's version silently
+stops tracking releases.
+
 ## Editing rules
 
-- Adding a plugin = add an entry to `plugins[]`; `name` must match the plugin's `plugin.json` `name`.
-- For vendored plugins, the "keep versions in sync" rule applies to
-  `plugins/<name>/.claude-plugin/plugin.json` in this repo — bump it and the
-  marketplace entry together.
-- Validate JSON before committing: `python3 -m json.tool .claude-plugin/marketplace.json`.
+- Adding a plugin = make its repo, then add an entry to `plugins[]`; `name` must
+  match the plugin's `plugin.json` `name` and `version` its current version.
+- Changing a plugin = a PR on that plugin's repo, not here. Its version bump
+  reaches this index through the sync.
+- Validate before committing: `claude plugin validate .` and
+  `scripts/check-index-only.sh`.
