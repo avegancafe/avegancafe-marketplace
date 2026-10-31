@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.4.1"
+    "version": "3.5.0"
   },
   "plugins": [
     {
@@ -53,6 +53,13 @@
       "version": "0.1.0",
       "description": "Diagnostic: proves whether plugin hooks fire in an environment (e.g. Claude Tag in Slack). Logs each SessionStart, UserPromptSubmit, PostToolUse and Stop event to /tmp/hook-probe.log. No network.",
       "category": "development"
+    },
+    {
+      "name": "juliet",
+      "source": "./plugins/juliet",
+      "version": "1.0.0",
+      "description": "Shared Claude Code tooling for Juliet, the scripted macOS + Fedora setup: the noelle agent and the skills it preloads (juliet-config, juliet-extension, juliet-cross-platform, juliet-bootstrap-step, add-app-config, add-fish-alias). Moved out of Juliet's stowed ~/.claude.",
+      "category": "productivity"
     }
   ]
 }
