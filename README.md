@@ -29,9 +29,10 @@ My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin
 /plugin install avegancafe@avegancafe-marketplace
 /plugin install hook-probe@avegancafe-marketplace
 /plugin install juliet@avegancafe-marketplace
-/plugin install duet@avegancafe-marketplace
 ```
 
 Then restart Claude Code.
+
+**duet** is the exception: it's for Claude Duet, which loads your claude.ai chat plugins, not Claude Code ones. Install it from this marketplace in your claude.ai chat plugins (it's linked as an account marketplace), then start a new Duet thread to pick it up.
 
 > **Note:** the marketplace and every plugin repo (`kitchen-brigade`, `beadwork`, `session-management`) are public, and the external plugins install over HTTPS, so anyone can add them. The `avegancafe`, `juliet` and `duet` plugins live in this repo under [`plugins/`](plugins/) and installs straight from the marketplace clone.
