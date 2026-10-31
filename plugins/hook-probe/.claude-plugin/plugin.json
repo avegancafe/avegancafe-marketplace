@@ -1,9 +1,0 @@
-{
-  "name": "hook-probe",
-  "version": "0.1.0",
-  "description": "Diagnostic plugin that proves whether plugin hooks fire in a given Claude environment (e.g. Claude Tag in Slack). Logs one line per SessionStart, UserPromptSubmit, PostToolUse and Stop event to /tmp/hook-probe.log. No network, no secrets.",
-  "author": {
-    "name": "Kyle Holzinger",
-    "url": "https://github.com/avegancafe"
-  }
-}
