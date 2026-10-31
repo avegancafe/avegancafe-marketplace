@@ -23,7 +23,8 @@ channel.
 
 | The ask | Where it goes |
 |---------|---------------|
-| A question you can answer, or a quick lookup or one-line change | Answer it in the chat. |
+| A question you can answer, or a quick lookup the coordinator's own tools can reach | Answer it in the chat. |
+| Anything that reads or changes a GitHub repo, however small | A task/thread: the coordinator can't read the channel's repos (see `duet-basics`). |
 | One piece of work with one result, even a long one (a single PR, a draft, a research question) | One task/thread in the current chat. |
 | An operation with **several parts** that each need their own session, run in parallel or in sequence, or that depend on each other (a rework across repos, a migration, a multi-step project, anything Kyle calls "a beast") | **A new channel**, with one task per part. |
 | An ongoing area Kyle will keep coming back to (a project, a repo, a life area) | A channel, even if today's ask is small. |
