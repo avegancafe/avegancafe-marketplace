@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.3.16"
+    "version": "3.4.0"
   },
   "plugins": [
     {
@@ -46,6 +46,13 @@
       "version": "3.7.0",
       "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). The session-title mod moved to session-management in 3.0.0.",
       "category": "productivity"
+    },
+    {
+      "name": "hook-probe",
+      "source": "./plugins/hook-probe",
+      "version": "0.1.0",
+      "description": "Diagnostic: proves whether plugin hooks fire in an environment (e.g. Claude Tag in Slack). Logs each SessionStart, UserPromptSubmit, PostToolUse and Stop event to /tmp/hook-probe.log. No network.",
+      "category": "development"
     }
   ]
 }
