@@ -9,6 +9,11 @@ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 ### Added
 - `juliet` 1.0.0, vendored under `plugins/juliet`: the `noelle` agent and its six Juliet skills (`juliet-config`, `juliet-extension`, `juliet-cross-platform`, `juliet-bootstrap-step`, `add-app-config`, `add-fish-alias`), moved out of Juliet's stowed `~/.claude`. Noelle and `juliet-config` now say Claude primitives belong in this marketplace (shared Juliet baseline → `juliet`, personal → `avegancafe`), and to ask Kyle before publishing.
 
+## [3.4.1] - 2026-10-31
+
+### Changed
+- `session-management` entry → 1.2.2 (synced automatically from the plugin's release; was 1.2.1).
+
 ## [3.4.0] - 2026-10-31
 
 ### Added
