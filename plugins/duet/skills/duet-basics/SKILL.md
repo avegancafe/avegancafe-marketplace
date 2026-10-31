@@ -1,6 +1,6 @@
 ---
 name: duet-basics
-description: Use when working inside Claude Duet (a main chat, a channel or a thread) and unsure how plugins, threads, channels, repos or sessions behave there — e.g. why a plugin isn't showing up, how to pick up a newly installed plugin, or how to give a channel access to a GitHub repo. Also covers how to add what you learn about Duet back into this plugin.
+description: Use when working inside Claude Duet (a main chat, a channel or a thread) and unsure how plugins, threads, channels, channel instructions, repos or sessions behave there — e.g. why a plugin isn't showing up, how to pick up a newly installed plugin, how to give a channel access to a GitHub repo, or how to make a channel always use a plugin agent. Also covers how to add what you learn about Duet back into this plugin.
 ---
 
 # Claude Duet basics
@@ -32,6 +32,17 @@ section) rather than working around it silently.
 - The coordinator session itself can't read those repos. Threads it starts
   **after** the repo was added can. So to work in a newly added repo, have the
   coordinator start a new thread.
+
+## Channel instructions
+
+- A channel's lasting behavior (e.g. "always use agent X here") is set through
+  the channel's instructions, not memory or a one-off brief.
+- The coordinator proposes new instructions with `propose_channel_instructions`,
+  which shows the user a card. They only change when the user taps Update, and
+  the coordinator can't see whether they did.
+- Threads don't pick an agent on their own. To make a channel always use a
+  plugin agent (like Noelle), put that in the channel instructions so the
+  coordinator briefs every thread to run as that agent and load its skills.
 
 ## Adding to this plugin
 

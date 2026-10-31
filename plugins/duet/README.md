@@ -17,4 +17,4 @@ claude.ai chat plugins. It takes effect in threads started after that.
 
 | Skill | Purpose |
 |-------|---------|
-| `duet-basics` | Where Duet's plugins come from and when they load, how threads and sessions relate, how a channel's repos are attached, and how to add new learnings to this plugin. |
+| `duet-basics` | Where Duet's plugins come from and when they load, how threads and sessions relate, how a channel's repos are attached, how channel instructions set lasting behavior (like always using a plugin agent), and how to add new learnings to this plugin. |
