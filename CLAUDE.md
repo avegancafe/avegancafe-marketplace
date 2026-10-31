@@ -63,6 +63,7 @@ scripts/sync-plugin-version.sh    # The sync itself: entry version + metadata bu
 plugins/                          # Plugins vendored in this repo
   avegancafe/                     # Kyle's personal plugin for one-off skills (work-notes-vault)
   hook-probe/                     # Diagnostic: logs hook events to check hooks fire (e.g. Claude Tag)
+  juliet/                         # Shared Juliet baseline: noelle agent + Juliet config skills
 README.md
 ```
 

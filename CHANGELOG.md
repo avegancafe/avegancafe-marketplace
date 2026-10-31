@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.5.0] - 2026-10-31
+
+### Added
+- `juliet` 1.0.0, vendored under `plugins/juliet`: the `noelle` agent and its six Juliet skills (`juliet-config`, `juliet-extension`, `juliet-cross-platform`, `juliet-bootstrap-step`, `add-app-config`, `add-fish-alias`), moved out of Juliet's stowed `~/.claude`. Noelle and `juliet-config` now say Claude primitives belong in this marketplace (shared Juliet baseline → `juliet`, personal → `avegancafe`), and to ask Kyle before publishing.
+
 ## [3.4.0] - 2026-10-31
 
 ### Added
