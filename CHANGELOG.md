@@ -4,10 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.8.0] - 2026-10-31
+## [3.9.0] - 2026-10-31
 
 ### Added
 - `duet` 0.3.0: new `channels-for-complex-work` skill with Kyle's rule that complex operations with several coordinated tasks get their own channel, with each part run as a task (and its own session) on that channel's Tasks list, so the main chat stays conversational. Covers when to answer directly, use one thread or make a channel; how to brief the channel's Claude in the handover; and how the main chat steers the channel instead of doing its work. `duet-basics` points to it.
+
+## [3.8.0] - 2026-10-31
+
+### Added
+- `linear-todos` 0.1.0 (external, `avegancafe/linear-todos`): a Claude Duet skill that manages Kyle's Linear TODO team through the Linear connector (add with the CLI's date rules and `!priority` marker, list, done, snooze, morning digest, evening review). Install it to claude.ai chat plugins.
 
 ## [3.7.0] - 2026-10-31
 
