@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.3.16"
+    "version": "3.4.0"
   },
   "plugins": [
     {
@@ -45,6 +45,13 @@
       "source": "./plugins/avegancafe",
       "version": "3.7.0",
       "description": "Kyle's personal Claude plugin. Skills: work-notes-vault (his private Obsidian work vault, avegancafe/notes--work, and its Granola meeting archive). The session-title mod moved to session-management in 3.0.0.",
+      "category": "productivity"
+    },
+    {
+      "name": "hairline",
+      "source": "./plugins/hairline",
+      "version": "0.1.0",
+      "description": "Hairline figures: isometric line-drawing animations that answer the pointer, as one self-contained HTML file. hairline-create draws one from an idea; hairline-adopt rebuilds an SVG as one. Vendored from Lucas Marques' MIT-licensed @lucasmarkes/hairline skills.",
       "category": "productivity"
     }
   ]
