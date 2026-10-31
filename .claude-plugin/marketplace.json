@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.7.0"
+    "version": "3.8.0"
   },
   "plugins": [
     {
@@ -66,6 +66,16 @@
       "source": "./plugins/duet",
       "version": "0.2.0",
       "description": "How Claude Duet works, for the agents running inside it: where plugins come from and when they load, threads vs sessions, and how a channel's repos are attached (duet-basics). Install to claude.ai chat plugins; grows as Duet behavior is learned.",
+      "category": "productivity"
+    },
+    {
+      "name": "linear-todos",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/linear-todos.git"
+      },
+      "version": "0.1.0",
+      "description": "Manage Kyle's Linear TODO team from Claude Duet through the Linear connector: add todos from plain text (eod/eow/eom dates, trailing !priority), list, done, snooze, and the morning digest and evening review. Instruction-only, no API key. Install to claude.ai chat plugins.",
       "category": "productivity"
     }
   ]
