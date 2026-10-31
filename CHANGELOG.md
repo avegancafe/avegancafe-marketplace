@@ -4,10 +4,15 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.5.1] - 2026-10-31
+## [3.5.2] - 2026-10-31
 
 ### Changed
 - Docs: dropped internal work-plugin and coworker names from the root and `avegancafe` READMEs, the `juliet-extension` skill and the 3.0.0 changelog entry; the README no longer claims the marketplace is public.
+
+## [3.5.1] - 2026-10-31
+
+### Changed
+- `session-management` entry → 1.3.0 (synced automatically from the plugin's release; was 1.2.2).
 
 ## [3.5.0] - 2026-10-31
 
