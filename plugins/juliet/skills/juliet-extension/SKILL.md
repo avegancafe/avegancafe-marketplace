@@ -10,7 +10,7 @@ Kyle's setup has three layers. `JULIET_EXTENSION` lists the extensions in order 
 | Layer | Repo | Holds |
 |-------|------|-------|
 | **Juliet** | `~/.config/Juliet` (`avegancafe/Juliet`, public) | Shared setup that anyone can run from `main`: packages, dotfiles and bootstrap steps that make sense for any Juliet user |
-| **juliet-j2** | `~/workspace/juliet-j2` (`avegancafe/juliet-j2`, **public**) | J2 work setup that every J2 engineer wants (Jordan and Aaron use it too): j2-claude-plugins, dev-env, gcloud/kubectl, J2 aliases. Nothing personal, and nothing internal (no hostnames, cluster/bucket names, project IDs) |
+| **juliet-j2** | `~/workspace/juliet-j2` (`avegancafe/juliet-j2`, **public**) | J2 work setup that every J2 engineer wants (other J2 engineers use it too): J2's Claude plugins, dev-env, gcloud/kubectl, J2 aliases. Nothing personal, and nothing internal (no hostnames, cluster/bucket names, project IDs) |
 | **juliet-kyle** | `~/workspace/juliet-kyle` (`avegancafe/juliet-kyle`) | Kyle's personal layer: his own apps and accounts (HEY, Obsidian, Zen, …), `[github] user`, and setup steps for those |
 
 `~/.config/Juliet/EXTENSIONS.md` is the source of truth for the extension format. Read it before changing the extension.
