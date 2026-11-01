@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.10.2"
+    "version": "3.10.3"
   },
   "plugins": [
     {
@@ -76,7 +76,7 @@
         "source": "url",
         "url": "https://github.com/avegancafe/linear-todos.git"
       },
-      "version": "0.2.0",
+      "version": "0.3.0",
       "description": "Manage Kyle's Linear TODO team from Claude Duet through the Linear connector: add todos from plain text (eod/eow/eom dates, trailing !priority), list, done, snooze, and the morning digest and evening review. Instruction-only, no API key. Install to claude.ai chat plugins.",
       "category": "productivity"
     }
