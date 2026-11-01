@@ -20,6 +20,7 @@ My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin
 | [**duet**](https://github.com/avegancafe/claude-plugin-duet) | How Claude Duet works, for the agents running inside it: where plugins come from and when they load, threads vs sessions, how a channel's repos are attached, and when complex work gets its own channel. Install it to your claude.ai chat plugins (not Claude Code). Grows as Duet behavior is learned. |
 | [**avegancafe**](https://github.com/avegancafe/claude-plugin-avegancafe) | My personal plugin for one-off skills: `work-notes-vault` (my private Obsidian work vault and its Granola archive), `/slurp` (voice recorder transcripts), `hifi-h2` (music onto my Rockbox player), `phone-push` (push notifications to my phone) and `flipper-usb` (Flipper Zero over USB). |
 | [**hairline**](https://github.com/avegancafe/claude-plugin-hairline) | Hairline figures: isometric line-drawing animations that answer the pointer, as one self-contained HTML file. `hairline-create` draws one from an idea; `hairline-adopt` rebuilds an SVG as one. From Lucas Marques' MIT-licensed hairline skills. |
+| [**ascii-magic-art**](https://github.com/avegancafe/ascii-magic-art) | 734 animated ASCII art pieces (MIT, a fork of kailashsr38/ascii-magic-art) plus two skills: `embed-ascii-art` puts a piece on a web page, README or terminal, self-hosted and themed to the page; `make-ascii-piece` writes a new one by hand, as lettering, or from a photo. |
 | [**task-graph**](https://github.com/avegancafe/claude-plugin-task-graph) | A live task graph pane you and Claude edit together: Claude records, claims and completes the outcomes you ask for, and your edits in the pane reach it. A mod. |
 
 ## Install a plugin
@@ -32,6 +33,7 @@ My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin
 /plugin install juliet@avegancafe-marketplace
 /plugin install hairline@avegancafe-marketplace
 /plugin install task-graph@avegancafe-marketplace
+/plugin install ascii-magic-art@avegancafe-marketplace
 ```
 
 Then restart Claude Code.

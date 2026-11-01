@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.12.5"
+    "version": "3.13.0"
   },
   "plugins": [
     {
@@ -98,6 +98,16 @@
       },
       "version": "0.2.0",
       "description": "A live, git-log-style task graph pane that you and Claude edit together. Claude records the outcomes you ask for, claims and completes them; your edits in the pane reach Claude. Light on tokens: deferred tools, and the graph is attached only when it changed.",
+      "category": "productivity"
+    },
+    {
+      "name": "ascii-magic-art",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/ascii-magic-art.git"
+      },
+      "version": "0.1.0",
+      "description": "734 animated ASCII art pieces (MIT, a fork of kailashsr38/ascii-magic-art) with two skills: embed-ascii-art drops a piece into a web page, README or terminal, self-hosted and themed to the page; make-ascii-piece writes a new piece by hand, as lettering, or from a photo, and validates it.",
       "category": "productivity"
     }
   ]

@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.13.0] - 2026-11-01
+
+### Added
+- `ascii-magic-art` plugin (0.1.0), from [`avegancafe/ascii-magic-art`](https://github.com/avegancafe/ascii-magic-art), a fork of [`kailashsr38/ascii-magic-art`](https://github.com/kailashsr38/ascii-magic-art) (MIT) that bundles the 734 animated pieces and runtime with the `embed-ascii-art` and `make-ascii-piece` skills. First used to rebrand kyleholzinger.dev/wedding.
+
 ## [3.12.5] - 2026-11-01
 
 ### Changed

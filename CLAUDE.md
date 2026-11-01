@@ -80,6 +80,7 @@ README.md, CONTRIBUTING.md, CHANGELOG.md
 | `duet` | `avegancafe/claude-plugin-duet` |
 | `hairline` | `avegancafe/claude-plugin-hairline` |
 | `task-graph` | `avegancafe/claude-plugin-task-graph` |
+| `ascii-magic-art` | `avegancafe/ascii-magic-art` (a fork of upstream, so it keeps upstream's name) |
 
 `avegancafe`, `juliet` and `duet` were vendored here under `plugins/` until
 marketplace 3.10.0; each moved to its own repo with its history.
