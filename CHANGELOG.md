@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.11.0] - 2026-11-01
+
+### Added
+- `hairline` plugin (0.1.0), from its own repo [`avegancafe/claude-plugin-hairline`](https://github.com/avegancafe/claude-plugin-hairline): the `hairline-create` and `hairline-adopt` skills from Lucas Marques' MIT-licensed [`lucasmarkes/hairline`](https://github.com/lucasmarkes/hairline), plus a video renderer and a figure viewer template. Replaces the vendored copy proposed in #21.
+
 ## [3.10.3] - 2026-11-01
 
 ### Changed
