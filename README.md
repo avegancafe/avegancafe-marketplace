@@ -19,6 +19,7 @@ My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin
 | [**juliet**](https://github.com/avegancafe/claude-plugin-juliet) | Shared Claude tooling for [Juliet](https://github.com/avegancafe/Juliet), the scripted macOS + Fedora setup: the `noelle` agent and the Juliet config skills it preloads. The baseline for anyone running Juliet. |
 | [**duet**](https://github.com/avegancafe/claude-plugin-duet) | How Claude Duet works, for the agents running inside it: where plugins come from and when they load, threads vs sessions, how a channel's repos are attached, and when complex work gets its own channel. Install it to your claude.ai chat plugins (not Claude Code). Grows as Duet behavior is learned. |
 | [**avegancafe**](https://github.com/avegancafe/claude-plugin-avegancafe) | My personal plugin for one-off skills: `work-notes-vault` (my private Obsidian work vault and its Granola archive), `/slurp` (voice recorder transcripts), `hifi-h2` (music onto my Rockbox player), `phone-push` (push notifications to my phone) and `flipper-usb` (Flipper Zero over USB). |
+| [**hairline**](https://github.com/avegancafe/claude-plugin-hairline) | Hairline figures: isometric line-drawing animations that answer the pointer, as one self-contained HTML file. `hairline-create` draws one from an idea; `hairline-adopt` rebuilds an SVG as one. From Lucas Marques' MIT-licensed hairline skills. |
 
 ## Install a plugin
 
@@ -28,6 +29,7 @@ My personal [Claude Code](https://docs.anthropic.com/en/docs/claude-code) plugin
 /plugin install session-management@avegancafe-marketplace
 /plugin install avegancafe@avegancafe-marketplace
 /plugin install juliet@avegancafe-marketplace
+/plugin install hairline@avegancafe-marketplace
 ```
 
 Then restart Claude Code.

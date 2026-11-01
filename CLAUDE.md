@@ -78,6 +78,7 @@ README.md, CONTRIBUTING.md, CHANGELOG.md
 | `avegancafe` | `avegancafe/claude-plugin-avegancafe` |
 | `juliet` | `avegancafe/claude-plugin-juliet` |
 | `duet` | `avegancafe/claude-plugin-duet` |
+| `hairline` | `avegancafe/claude-plugin-hairline` |
 
 `avegancafe`, `juliet` and `duet` were vendored here under `plugins/` until
 marketplace 3.10.0; each moved to its own repo with its history.
