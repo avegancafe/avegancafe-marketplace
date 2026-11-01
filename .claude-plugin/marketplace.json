@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.11.0"
+    "version": "3.12.0"
   },
   "plugins": [
     {
@@ -88,6 +88,16 @@
       },
       "version": "0.1.0",
       "description": "Hairline figures: isometric line-drawing animations that answer the pointer, as one self-contained HTML file. hairline-create draws one from an idea; hairline-adopt rebuilds an SVG as one. Vendored from Lucas Marques' MIT-licensed @lucasmarkes/hairline skills.",
+      "category": "productivity"
+    },
+    {
+      "name": "task-graph",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/avegancafe/claude-plugin-task-graph.git"
+      },
+      "version": "0.2.0",
+      "description": "A live, git-log-style task graph pane that you and Claude edit together. Claude records the outcomes you ask for, claims and completes them; your edits in the pane reach Claude. Light on tokens: deferred tools, and the graph is attached only when it changed.",
       "category": "productivity"
     }
   ]
