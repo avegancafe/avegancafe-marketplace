@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.12.0] - 2026-11-01
+
+### Added
+- `task-graph` plugin (0.2.0), from its own repo [`avegancafe/claude-plugin-task-graph`](https://github.com/avegancafe/claude-plugin-task-graph): a live task graph pane (a mod) that you and Claude edit together. It was a mod in Juliet until now; its history came with it.
+
 ## [3.11.0] - 2026-11-01
 
 ### Added
