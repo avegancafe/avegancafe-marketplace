@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.12.4"
+    "version": "3.12.5"
   },
   "plugins": [
     {
@@ -66,7 +66,7 @@
         "source": "url",
         "url": "https://github.com/avegancafe/claude-plugin-duet.git"
       },
-      "version": "0.5.0",
+      "version": "0.6.0",
       "description": "How Claude Duet works, for the agents running inside it: where plugins come from and when they load, threads vs sessions, how a channel's repos are attached (duet-basics), and when to give complex multi-task work its own channel coordinated through its Tasks list (channels-for-complex-work). Install to claude.ai chat plugins; grows as Duet behavior is learned.",
       "category": "productivity"
     },
