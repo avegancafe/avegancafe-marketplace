@@ -4,6 +4,11 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres
 to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.13.8] - 2026-11-08
+
+### Changed
+- `duet` entry → 0.9.0 (synced automatically from the plugin's release; was 0.8.1).
+
 ## [3.13.7] - 2026-11-04
 
 ### Changed
