@@ -7,7 +7,7 @@
     "url": "https://github.com/avegancafe"
   },
   "metadata": {
-    "version": "3.13.10"
+    "version": "3.13.11"
   },
   "plugins": [
     {
@@ -46,7 +46,7 @@
         "source": "url",
         "url": "https://github.com/avegancafe/claude-plugin-avegancafe.git"
       },
-      "version": "3.7.0",
+      "version": "3.8.0",
       "description": "Kyle's personal Claude plugin for one-offs: work-notes-vault (his private Obsidian work vault and its Granola + voice-recorder archives), /slurp (transcribe the USB voice recorder into that vault), hifi-h2 (tag and load music onto his Rockbox player), phone-push (push notifications to his phone, now or scheduled) and flipper-usb (drive his Flipper Zero over USB).",
       "category": "productivity"
     },
